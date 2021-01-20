@@ -1,28 +1,39 @@
 import java.io.*;
 import java.net.*;
 
-public class EchoClient
-{
-    public static void main(String[] args)
-    {
-
-        int portNumber = 8080; // default port number
-        String hostname = "127.0.0.1"; // localhost
-
-        if ( args.length == 1 )
-        {
-            hostname = args[0];
+class Client {
+ 
+    public static void main(String args[]) throws IOException {
+        Socket socket = null;
+        String str = null;
+        BufferedReader buffread = null;
+        DataOutputStream dos = null;
+        BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
+        try {
+            socket = new Socket("localhost", 1234);
+            buffread = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            dos = new DataOutputStream(socket.getOutputStream());
+        } catch (UnknownHostException unknownHostExc) {
+            System.out.println("Unknown Host");
+            System.exit(0);
         }
-        else if ( args.length == 2 )
-        {
-            hostname = args[0];
-            portNumber = Integer.parseInt(args[1]);;
+        System.out.println("To start the dialog type the message in this client window \n Type quit to end");
+        while (true) {
+            str = userInput.readLine();
+            dos.writeBytes(str);
+            dos.write(13);
+            dos.write(10);
+            dos.flush();
+            String line, lettersOnly;
+            line = buffread.readLine();
+			lettersOnly = line.replaceAll("[^a-zA-Z]","");
+			if (lettersOnly.matches("(?i)quit")) {
+                break;
+            }
+            System.out.println("From server, Echo: " + lettersOnly);
         }
-        else if ( args.length > 2 )
-        {
-            System.out.println("Incorrect Arguments Entered: <hostname> <port number>[default=8080]");
-            System.exit(1);
-        }
-
+        buffread.close();
+        dos.close();
+        socket.close();
     }
 }
