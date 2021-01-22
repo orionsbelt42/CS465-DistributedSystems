@@ -29,21 +29,49 @@ class EchoThread implements Runnable
        catch (IOException ioExec) {System.err.println(ioExec);}
        try {
            int charInt;
-           String buffer = "";
+           // String buffer = "";
            char charFromClient;
-
+           boolean writeBuffer = false;
+           int state = 0;
            while (true){
+               //System.out.print("[" + fromClient.available() + "]"  + '\n');
+               if (fromClient.available() == 0 && state == 4){
+                   break;
+               }
 
                charInt = fromClient.read();
+
                charFromClient = (char)charInt;
                //if ((charInt >= Character.getNumericValue('a') && charInt <= Character.getNumericValue('z')) || (charInt >= Character.getNumericValue('A') && charInt <= Character.getNumericValue('Z')) ){
 
                if ((charInt >= (int)'a' && charInt <= (int)'z') || (charInt >= (int)'A' && charInt <= (int)'Z') ) {
                     toClient.write(charInt);
-               }
-               else
-               {
-                   buffer += (char)charInt;
+
+                    // System.out.print("[" + fromClient.available() + "]" + charFromClient + '\n');
+                    if (charFromClient == 'q') {
+                        state = 1;
+                    }
+
+                    else if (charFromClient == 'u' && state == 1){
+                        state = 2;
+                    }
+
+                    else if (charFromClient == 'i' && state == 2){
+                        state = 3;
+                    }
+
+                    else if (charFromClient == 't' && state == 3){
+                        state = 4;
+                    }
+                    /**
+                    else if (charFromClient == (char)charInt && state == 4){
+                        state = 0;
+                    }
+                    **/
+                    else {
+                        state = 0;
+                    }
+
                }
 
            }
