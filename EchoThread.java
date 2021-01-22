@@ -4,50 +4,52 @@ import java.util.Scanner;
 
 class EchoThread implements Runnable
 {
-   private Socket socket;
-   private int count;
-   // private long id;
-   InputStream fromClient;
-   OutputStream toClient;
-   // private PrintWriter printWrite;
+   private Socket socket; // system socket
+   private int count; // thread number
+
+   InputStream fromClient; // stream for incoming data from client
+   OutputStream toClient; // stream for outgoing data from server
+
 
    EchoThread(Socket newSocket, int newCount)
    {
-       socket = newSocket;
-       count = newCount;
+       socket = newSocket; // assign server socket to local
+       count = newCount; // copy thread number
    }
 
    @Override
    public void run()
    {
+       int charInt; // Integer form of byte from client (UTF8)
+       int state = 0; // current NFA state
+
+       char charFromClient; // char form of byte from client (UTF8)
+
        try
        {
-           // System.out.println(count);
-           fromClient = socket.getInputStream();
-           toClient = socket.getOutputStream();
-       }
-       catch (IOException ioExec) {System.err.println(ioExec);}
-       try {
-           int charInt;
-           // String buffer = "";
-           char charFromClient;
-           boolean writeBuffer = false;
-           int state = 0;
+           fromClient = socket.getInputStream(); // bind to stream from client
+           toClient = socket.getOutputStream(); // bind to stream to client
+
+           // loop until all bytes are read
            while (true){
-               //System.out.print("[" + fromClient.available() + "]"  + '\n');
-               if (fromClient.available() == 0 && state == 4){
-                   break;
-               }
 
-               charInt = fromClient.read();
+                // check for end of stream and quit final state
+                if (fromClient.available() == 0 && state == 4){
+                    break; // end loop
+                }
 
-               charFromClient = (char)charInt;
-               //if ((charInt >= Character.getNumericValue('a') && charInt <= Character.getNumericValue('z')) || (charInt >= Character.getNumericValue('A') && charInt <= Character.getNumericValue('Z')) ){
+                charInt = fromClient.read(); // read one byte from client
 
-               if ((charInt >= (int)'a' && charInt <= (int)'z') || (charInt >= (int)'A' && charInt <= (int)'Z') ) {
-                    toClient.write(charInt);
+                charFromClient = (char)charInt; // convert int version of input to char
 
-                    // System.out.print("[" + fromClient.available() + "]" + charFromClient + '\n');
+
+                // check if char from client is in UTF8 char value range (a-z) or (A-Z)
+                if ((charFromClient >= 'a' && charFromClient <= 'z') || (charFromClient >= 'A' && charFromClient <= 'Z') ) {
+
+                    toClient.write(charInt); // echo char back to client
+
+                    // look for "quit" command from client
+                    // implements simple 5 state NFA
                     if (charFromClient == 'q') {
                         state = 1;
                     }
@@ -63,32 +65,16 @@ class EchoThread implements Runnable
                     else if (charFromClient == 't' && state == 3){
                         state = 4;
                     }
-                    /**
-                    else if (charFromClient == (char)charInt && state == 4){
-                        state = 0;
-                    }
-                    **/
+
                     else {
                         state = 0;
                     }
-
                }
-
            }
-
-           /**
-           //printWrite = new PrintWriter(toClient, true);
-           while(scan.hasNextLine())
-           {
-               String line = scan.nextLine();
-               System.out.println("Client " + count + ": " + line);
-               printWrite.println(line);
-           }
-           **/
        }
-       catch (IOException ioExec) {System.err.println(ioExec);}
+       catch (IOException ioExec) {System.err.println(ioExec);} // If there are problems, display the error and exit
        finally {
-           System.out.println("Client " + count + " left the session.");
+           System.out.println("Client " + count + " left the session."); // display client exit on server
        }
    }
 }
