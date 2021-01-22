@@ -55,27 +55,27 @@ class EchoThread implements Runnable
                     // implements simple 5 state NFA
                     if (charFromClient == 'q')
                     {
-                        state = 1;
+                        state = 1; // advance state
                     }
 
                     else if (charFromClient == 'u' && state == 1)
                     {
-                        state = 2;
+                        state = 2; // advance state
                     }
 
                     else if (charFromClient == 'i' && state == 2)
                     {
-                        state = 3;
+                        state = 3; // advance state
                     }
 
                     else if (charFromClient == 't' && state == 3)
                     {
-                        state = 4;
+                        state = 4; // advance to final state
                     }
 
                     else
                     {
-                        state = 0;
+                        state = 0; // reset state
                     }
                }
            }
