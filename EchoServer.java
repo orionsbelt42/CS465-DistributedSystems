@@ -1,79 +1,49 @@
 import java.net.*;
 import java.io.*;
 
-class EchoThread implements Runnable {
-    int id;
+public class Server
+{
+    public static void main(String[] args) throws IOException
+    {
 
-    Socket socket;
 
-    EchoThread(int id, Socket socket){
-        this.id = id;
-        this.socket = socket;
-    }
+        int portNumber = 1234; // default port number
+        int numberOfThreads = 2; // localhost
 
-    @Override
-    public void run() {
+        if ( args.length == 1 )
+        {
+            portNumber = Integer.parseInt(args[0]);
+        }
+        else if ( args.length == 2 )
+        {
+            portNumber = Integer.parseInt(args[0]);
+            numberOfThreads = Integer.parseInt(args[1]);
+        }
+        else if ( args.length > 2 )
+        {
+            System.out.println("Incorrect Arguments Entered: <port number>[default=8080] <threads>[default=2]");
+            System.exit(1);
+        }
 
-            System.out.printf("Client Connected --> Assigned Thread: %d\n", id);
-            try (
-                InputStream fromClient = this.socket.getInputStream();
-                OutputStream toClient = this.socket.getOutputStream();
-            ) {
+        int count = 0;
+        long[] ids = new long[10];
+        //System.out.println("Clients connected: " + Thread.activeCount());
 
-                while (true){
-                    int input = fromClient.read();
-                    //System.out.printf("[Thread %d] Message: ")
-                    if ( (char)(input) == 'e' ) {
-                        break;
-                    }
-                    else {
-                        toClient.write(input);
-                    }
+        try (ServerSocket serverSocket = new ServerSocket(1234))
+        {
+            System.out.println("Listening...");
 
-                }
-                System.out.printf("Client Disconnected --> Releasing Thread: %d\n", this.id);
+            while(true)
+            {
+                Socket socket = serverSocket.accept();
+                count = Thread.activeCount();
+                Runnable run = new EchoThread(socket, count);
+                Thread thread = new Thread(run);
+				System.out.println("Clients connected: " + count);
+                thread.start();
 
-            } catch (IOException e) {
-                System.out.println("Exception caught:");
-                System.out.println(e.getMessage());
             }
-
-    }
-
-
-}
-
-class Server {
-
-
-    public static void main(String[] args) throws IOException {
-
-        int port = 8080;
-        int numberOfThreads = 0;
-
-
-        try (
-            ServerSocket serverSocket = new ServerSocket( port ); //Integer.parseInt(args[0]));
-
-            ) {
-            while ( true ){
-                if (Thread.activeCount() < 5) {
-                    Socket socket = serverSocket.accept();
-                    EchoThread clientThread = new EchoThread(numberOfThreads % 4, socket);
-                    Thread thread = new Thread(clientThread);
-                    thread.start();
-
-                    numberOfThreads++;
-                }
-            }
-
-            //serverSocket.close();
-
-        } catch (IOException e) {
-            System.out.println("Exception caught:");
-            System.out.println(e.getMessage());
         }
 
     }
-
 }
