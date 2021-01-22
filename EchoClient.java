@@ -1,37 +1,101 @@
 import java.io.*;
 import java.net.*;
+import java.util.Scanner;
 
-class Client {
- 
-    public static void main(String args[]) throws IOException {
+public class EchoClient
+{
+    public static void main(String[] args) throws IOException
+    {
         Socket socket = null;
         String str = null;
         BufferedReader buffread = null;
         DataOutputStream dos = null;
         BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
+                                                                            
+        // get and parse connection arguments
+        int portNumber = 1234; // default port number
+        String hostname = "127.0.0.1"; // localhost
+   
+        if ( args.length == 1 )
+        {
+            hostname = args[0];
+        }
+        else if( args.length == 2 )
+        {
+            hostname = args[0];
+            portNumber = args[1];
+        }          
+        else if ( args.length > 2 )
+        {
+            System.out.println("Incorrect Arguments Entered: <hostname> <port number>[default=8080]");
+            System.exit(1);
+        }
+
+        // setup connection to server
         try {
-            socket = new Socket("localhost", 1234);
-            buffread = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            dos = new DataOutputStream(socket.getOutputStream());
-        } catch (UnknownHostException unknownHostExc) {
-            System.out.println("Unknown Host");
-            System.exit(0);
-        }
-        System.out.println("To start the dialog type the message in this client window \n Type quit to end");
-        while (true) {
-            str = userInput.readLine();
-            dos.writeBytes(str);
-            dos.write(13);
-            dos.write(10);
-            dos.flush();
-            String line, lettersOnly;
-            line = buffread.readLine();
-			lettersOnly = line.replaceAll("[^a-zA-Z]","");
-			if (lettersOnly.matches("(?i)quit")) {
-                break;
+            Socket echoSocket = new Socket(hostname, portNumber); // connect to socket
+            //PrintWriter out = new PrintWriter(echoSocket.getOutputStream(), true);
+
+            InputStream fromServer = echoSocket.getInputStream();
+            OutputStream toServer = echoSocket.getOutputStream();
+
+            Scanner scan = new Scanner(System.in);
+            while (true) 
+            {
+                String userInput = scan.nextLine() + '\n';
+                String output = "";
+
+                output = recvBytes(sendBytes(userInput, toServer), fromServer);
+
+                /**
+                toServer.write(userInput.getBytes("UTF8"));
+                System.out.print(fromServer.read());
+                **/
             }
-            System.out.println("From server, Echo: " + lettersOnly);
+        } catch (UnknownHostException e) {
+            System.err.println("Connection Failed: Unknown Host [" + hostname + "]");
+            System.exit(1);
+        } catch (IOException e) {
+            System.err.println("Couldn't connect to server @ host [" + hostname + ":" + portNumber + "]");
+            System.exit(1);
         }
+
+    }
+
+    private static int sendBytes( String out, OutputStream stream ) {
+        try {
+            byte[] bytesOut = out.getBytes("UTF8");
+            stream.write(bytesOut);
+            System.out.print("Sent: " + out);
+
+            return bytesOut.length;
+        } catch (UnsupportedEncodingException e){
+            System.out.println(e);
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+
+        return 0;
+    }
+
+
+    private static String recvBytes( int length, InputStream stream ) {
+        String buffer = "";
+        try {
+            System.out.print("Recieved: ");
+            for (int recvIndex = 0; recvIndex < length; recvIndex++ ){
+                buffer += (char)stream.read();
+            }
+        } catch (IOException e) {
+            System.out.println(e);
+        }
+
+        System.out.println(buffer);
+
+        return buffer;
+    }
+
+}
         buffread.close();
         dos.close();
         socket.close();
