@@ -23,7 +23,7 @@ public class EchoClient
         }
         else if ( args.length > 2 ) // prompt user if incorrect
         {
-            System.out.println("Incorrect Arguments Entered: <hostname> <port number>[default=8080]");
+            System.out.println("Incorrect Arguments: <hostname> <port number>[default=8080]");
             System.exit(1);
         }
 
