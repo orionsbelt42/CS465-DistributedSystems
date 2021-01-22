@@ -41,7 +41,9 @@ public class EchoClient
             {
                 String userInput = scan.nextLine(); // get user input
                 String output = ""; // store output here
-                int outputLen = sendBytes(userInput, toServer); // get and store expected filtered Lenght
+
+                // get and store expected filtered length
+                int outputLen = sendBytes(userInput, toServer);
 
                 output = recvBytes(outputLen, fromServer); // get and store output from server
 
@@ -58,7 +60,7 @@ public class EchoClient
         }
         catch (IOException e)
         {
-            System.err.println("Couldn't connect to server @ host [" + hostname + ":" + portNumber + "]");
+            System.err.println("Couldn't connect to host [" + hostname + ":" + portNumber + "]");
             System.exit(1);
         }
 
@@ -75,7 +77,9 @@ public class EchoClient
 
             for (int i = 0; i < bytesOut.length; i++) // loop over chars
             {
-                if ((bytesOut[i] >= (int)'a' && bytesOut[i] <= (int)'z') || (bytesOut[i] >= (int)'A' && bytesOut[i] <= (int)'Z') ) // get filtered length for return
+                // get filtered length for return
+                if ((bytesOut[i] >= (int)'a' && bytesOut[i] <= (int)'z')
+                    || (bytesOut[i] >= (int)'A' && bytesOut[i] <= (int)'Z') )
                 {
                     filteredLen++;
                 }
@@ -100,14 +104,16 @@ public class EchoClient
         String buffer = ""; // store revieved bytes here
         try
         {
-            for (int recvIndex = 0; recvIndex < length; recvIndex++ ) // while there is still expected length
+            // loop while there is still expected length
+            for (int recvIndex = 0; recvIndex < length; recvIndex++ )
             {
                 buffer += (char)stream.read(); // read and store from input stream
             }
 
             System.out.println("Recieved: " + buffer); // print recieved string for checking
 
-            if (buffer.substring( length - 4, length ).equals("quit")) // if quit is returned
+            // if quit is returned
+            if (length > 0 && buffer.substring( length - 4, length ).equals("quit"))
             {
                 return "quit"; // send quit to caller
             }

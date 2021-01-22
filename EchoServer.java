@@ -13,7 +13,8 @@ public class EchoServer
         }
         else if ( args.length > 1 ) // if they mess up and give too many args
         {
-            System.out.println("Incorrect Arguments Entered: <port number>[default=8080]"); // prompt user for correction
+            // prompt user for correction
+            System.out.println("Incorrect Arguments Entered: <port number>[default=8080]");
             System.exit(1); // exit
         }
 
@@ -36,7 +37,8 @@ public class EchoServer
                 thread.start(); // start the thread
 
                 current = Thread.activeCount() - 1;
-                System.out.println("Clients connected: " + current);// show number of users currently connected
+                // show number of users currently connected
+                System.out.println("Clients connected: " + current);
             }
         }
     }

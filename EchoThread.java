@@ -45,7 +45,8 @@ class EchoThread implements Runnable
                 charFromClient = (char)charInt; // convert int version of input to char
 
                 // check if char from client is in UTF8 char value range (a-z) or (A-Z)
-                if ((charFromClient >= 'a' && charFromClient <= 'z') || (charFromClient >= 'A' && charFromClient <= 'Z') )
+                if ((charFromClient >= 'a' && charFromClient <= 'z')
+                    || (charFromClient >= 'A' && charFromClient <= 'Z') )
                 {
 
                     toClient.write(charInt); // echo char back to client
@@ -79,10 +80,11 @@ class EchoThread implements Runnable
                }
            }
        }
-       catch (IOException ioExec) {System.err.println(ioExec);} // If there are problems, display the error and exit
+       // If there are problems, display the error and exit
+       catch (IOException ioExec) {System.err.println(ioExec);}
        finally
        {
-           System.out.println("Client " + count + " left the session."); // display client exit on server
+           System.out.println("Client " + count + " left the session."); // display client exit
        }
    }
 }
