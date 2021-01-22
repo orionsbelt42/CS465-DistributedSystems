@@ -19,8 +19,7 @@ public class EchoServer
         }
 
         int count = 0; // number of clients since server start
-        int current;
-        System.out.println("Clients connected: 0"); // start with o client
+        int current; // number of current connections
 
         try (ServerSocket serverSocket = new ServerSocket(portNumber);)
         {
