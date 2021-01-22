@@ -4,41 +4,44 @@ import java.util.Scanner;
 
 public class EchoClient
 {
-    public static void main(String[] args)
+    public static void main(String[] args) throws IOException
     {
+        Socket socket = null;
+        String str = null;
+        BufferedReader buffread = null;
+        DataOutputStream dos = null;
+        BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
+                                                                            
         // get and parse connection arguments
-
         int portNumber = 1234; // default port number
         String hostname = "127.0.0.1"; // localhost
-
+   
         if ( args.length == 1 )
         {
             hostname = args[0];
         }
-        else if ( args.length == 2 )
+        else if( args.length == 2 )
         {
             hostname = args[0];
-            portNumber = Integer.parseInt(args[1]);;
-        }
+            portNumber = args[1];
+        }          
         else if ( args.length > 2 )
         {
             System.out.println("Incorrect Arguments Entered: <hostname> <port number>[default=8080]");
             System.exit(1);
         }
 
-
         // setup connection to server
-        try (
+        try {
             Socket echoSocket = new Socket(hostname, portNumber); // connect to socket
             //PrintWriter out = new PrintWriter(echoSocket.getOutputStream(), true);
 
             InputStream fromServer = echoSocket.getInputStream();
             OutputStream toServer = echoSocket.getOutputStream();
-        ) {
 
             Scanner scan = new Scanner(System.in);
-            while (true) {
-
+            while (true) 
+            {
                 String userInput = scan.nextLine() + '\n';
                 String output = "";
 
@@ -92,4 +95,9 @@ public class EchoClient
         return buffer;
     }
 
+}
+        buffread.close();
+        dos.close();
+        socket.close();
+    }
 }

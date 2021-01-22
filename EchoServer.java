@@ -1,12 +1,10 @@
 import java.net.*;
 import java.io.*;
 
-public class Server
+public class EchoServer
 {
     public static void main(String[] args) throws IOException
     {
-
-
         int portNumber = 1234; // default port number
         int numberOfThreads = 2; // localhost
 
@@ -39,11 +37,10 @@ public class Server
                 count = Thread.activeCount();
                 Runnable run = new EchoThread(socket, count);
                 Thread thread = new Thread(run);
-				System.out.println("Clients connected: " + count);
+				        System.out.println("Clients connected: " + count);
                 thread.start();
 
             }
         }
-
-    }
+    }         
 }
