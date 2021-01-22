@@ -8,14 +8,14 @@ public class EchoClient
     {
         Socket socket = null;
         String str = null;
-        BufferedReader buffread = null;
-        DataOutputStream dos = null;
-        BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
-                                                                            
+        //BufferedReader buffread = null;
+        //DataOutputStream dos = null;
+        //BufferedReader userInput = new BufferedReader(new InputStreamReader(System.in));
+
         // get and parse connection arguments
         int portNumber = 1234; // default port number
         String hostname = "127.0.0.1"; // localhost
-   
+
         if ( args.length == 1 )
         {
             hostname = args[0];
@@ -23,8 +23,8 @@ public class EchoClient
         else if( args.length == 2 )
         {
             hostname = args[0];
-            portNumber = args[1];
-        }          
+            portNumber = Integer.parseInt(args[1]);
+        }
         else if ( args.length > 2 )
         {
             System.out.println("Incorrect Arguments Entered: <hostname> <port number>[default=8080]");
@@ -40,12 +40,13 @@ public class EchoClient
             OutputStream toServer = echoSocket.getOutputStream();
 
             Scanner scan = new Scanner(System.in);
-            while (true) 
+            while (true)
             {
                 String userInput = scan.nextLine() + '\n';
                 String output = "";
+                int outputLen = sendBytes(userInput, toServer);
 
-                output = recvBytes(sendBytes(userInput, toServer), fromServer);
+                output = recvBytes(outputLen, fromServer);
 
                 /**
                 toServer.write(userInput.getBytes("UTF8"));
@@ -64,11 +65,17 @@ public class EchoClient
 
     private static int sendBytes( String out, OutputStream stream ) {
         try {
+            int filteredLen = 0;
             byte[] bytesOut = out.getBytes("UTF8");
             stream.write(bytesOut);
             System.out.print("Sent: " + out);
 
-            return bytesOut.length;
+            for (int i = 0; i < bytesOut.length; i++){
+                if ((bytesOut[i] >= (int)'a' && bytesOut[i] <= (int)'z') || (bytesOut[i] >= (int)'A' && bytesOut[i] <= (int)'Z') ) {
+                    filteredLen++;
+                }
+            }
+            return filteredLen;
         } catch (UnsupportedEncodingException e){
             System.out.println(e);
         } catch (IOException e) {
@@ -95,9 +102,4 @@ public class EchoClient
         return buffer;
     }
 
-}
-        buffread.close();
-        dos.close();
-        socket.close();
-    }
 }
