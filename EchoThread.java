@@ -4,7 +4,6 @@ import java.util.Scanner;
 
 class EchoThread implements Runnable
 {
-
    private Socket socket;
    private int count;
    // private long id;
@@ -31,20 +30,15 @@ class EchoThread implements Runnable
        try {
            int charInt;
            String buffer = "";
-           char charFromClient = (char)charInt;
+           char charFromClient;
 
            while (true){
 
                charInt = fromClient.read();
-
-               if ((char)(charInt) == '\n'){
-
-                   toClient.write('\n');
-               }
-
+               charFromClient = (char)charInt;
                //if ((charInt >= Character.getNumericValue('a') && charInt <= Character.getNumericValue('z')) || (charInt >= Character.getNumericValue('A') && charInt <= Character.getNumericValue('Z')) ){
 
-               else if ((charInt >= (int)'a' && charInt <= (int)'z') || (charInt >= (int)'A' && charInt <= (int)'Z') ) {
+               if ((charInt >= (int)'a' && charInt <= (int)'z') || (charInt >= (int)'A' && charInt <= (int)'Z') ) {
                     toClient.write(charInt);
                }
                else
