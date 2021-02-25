@@ -3,10 +3,18 @@ import java.io.*;
 
 public class Server extends Thread
 {
+    int portNumber;
+    public static ChatNode chat;
+
+    Server(int port)
+    {
+        portNumber = port;
+        //chat = calling;
+    }
     @Override
     public void run()
     {
-        int portNumber = 8080; // default port number
+        //int portNumber = 8080; // default port number
 
 
 
@@ -16,7 +24,7 @@ public class Server extends Thread
             while(true)
             {
                 Socket socket = serverSocket.accept(); // wait for a connection
-                System.out.println("[Connected]");
+                //System.out.println("[Connected]");
 
                 // count = Thread.activeCount();
                 Runnable run = new ServerThread(socket); // create new Runnable

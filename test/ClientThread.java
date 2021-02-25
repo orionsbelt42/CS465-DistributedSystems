@@ -1,6 +1,7 @@
 import java.io.*;
 import java.net.*;
 
+
 public class ClientThread implements Runnable {
 
     //Socket socket;
@@ -28,8 +29,8 @@ public class ClientThread implements Runnable {
         ) {
             //System.out.println("Setup connection");
             out.println(message);
-            //System.out.println("sent: " + message);
-            //echoSocket.close();
+            System.out.println("sent: " + message);
+            echoSocket.close();
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
             // System.exit(1);

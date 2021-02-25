@@ -1,8 +1,11 @@
 import java.net.*;
 import java.io.*;
+import java.util.*;
 
 public class ChatNode
 {
+
+    public static ArrayList<Node> connections = new ArrayList<Node>();
     public static void main(String[] args) throws IOException, InterruptedException
     {
 
@@ -10,9 +13,9 @@ public class ChatNode
         int count = 0; // number of clients since server start
         int current; // number of current connections
 
-        int num = 0;
+        int num = 8080;
 
-        Server thread = new Server(); // assign Runnable to thread
+        Server thread = new Server(num); // assign Runnable to thread
         thread.start(); // start the thread
         //Thread.sleep(4000);
 
@@ -22,6 +25,8 @@ public class ChatNode
         // count = Thread.activeCount();
         //Runnable run = new ServerThread(serverSocket); // create new Runnable
 
+
+        /*
         System.out.println("Creating clients");
         int temp = 0;
         while ( temp < 10 ){
@@ -31,7 +36,11 @@ public class ChatNode
 
             temp++;
         }
-
+        */
+        Thread.sleep(10000);
+        for (Node i:connections)
+        {System.out.println(i.toString());}
 
     }
+
 }
