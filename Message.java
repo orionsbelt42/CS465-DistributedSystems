@@ -14,8 +14,8 @@ public class Message {
     private MessageType messageID;
     private String body;
     private int chatPort = 4200;
-// host should be passed in?
-String host = "some_host_ip_as_received_in_participant";
+	// host should be passed in?
+	String host = "some_host_ip_as_received_in_participant";
     public Boolean Message(int senderIDEntry, MessageType type, String note) throws IOException
     {
         try {
@@ -25,27 +25,27 @@ String host = "some_host_ip_as_received_in_participant";
             DatagramPacket outpack = new DatagramPacket(data, data.length, InetAddress.getByName(host), chatPort);
             outsock.send(outpack);
             System.out.print("sent " + note);
-            return true;
         } catch (IOException ioerr) {
             return false;
         }
+        senderID = senderIDEntry;
+        messageID = type;
+
+        if(messageID == MessageType.JOINING){
+            body = "Client is attempting to join Peer2Peer chat group";
+        }
+        else if( messageID == MessageType.JOINED){
+            body = "Client has successfully joined Peer2Peer chat group";
+        }
+        else if( messageID == MessageType.NOTE) {
+            body = note;
+        }
+        else {
+            body = "Client has left the Peer2Peer chat group";
+        }
+
+		return true;
     }
-//        senderID = senderIDEntry;
-//        messageID = type;
-//
-//        if(messageID == MessageType.JOINING){
-//            body = "Client is attempting to join Peer2Peer chat group";
-//        }
-//        else if( messageID == MessageType.JOINED){
-//            body = "Client has successfully joined Peer2Peer chat group";
-//        }
-//        else if( messageID == MessageType.NOTE) {
-//            body = note;
-//        }
-//        else {
-//            body = "Client has left the Peer2Peer chat group";
-//        }
-//    }
 
     public int getSenderID(){
         return senderID;
