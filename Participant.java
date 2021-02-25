@@ -5,10 +5,8 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 import java.util.*;
-/**
- *
- * @author Fisch
- */
+
+
 
 public class Participant extends Thread {
     private int port;
@@ -89,11 +87,11 @@ public class Participant extends Thread {
     }
 
     public void sendMessage(int SenderID, Message note){
-
+	
     }
 
     public void displayMessage(Message note){
-
+		println(note);
     }
 
     public void leave(){
