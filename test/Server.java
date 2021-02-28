@@ -20,10 +20,11 @@ public class Server extends Thread
 
         try (ServerSocket serverSocket = new ServerSocket(portNumber);)
         {
-            System.out.println("Listening...");
+            System.out.println("Listening... server" +  serverSocket.getLocalSocketAddress());
             while(true)
             {
                 Socket socket = serverSocket.accept(); // wait for a connection
+                System.out.println("Socket: " + socket.getLocalSocketAddress());
                 //System.out.println("[Connected]");
 
                 // count = Thread.activeCount();

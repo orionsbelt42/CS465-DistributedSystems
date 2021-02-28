@@ -15,6 +15,8 @@ public class Node {
     String name;
     String hostName;
     int port;
+    String body;
+    String action;
 
     Node(){
         id = -1;
@@ -30,8 +32,23 @@ public class Node {
         port = newPortNumber;
     }
 
+    Node(int newId, String newName, String newHostName, int newPortNumber, String msgAction, String msgBody){
+        id = newId;
+        name = newName;
+        hostName = newHostName;
+        port = newPortNumber;
+        action = msgAction;
+        body = msgBody;
+    }
+
+    public void showValues(){
+        System.out.println("action: "  + action);
+        System.out.println("body: " + body);
+    }
+
     public String toString(){
-        return "\n=================================\nID: " + String.valueOf(id) + "\nNAME: " + name + "\nADDRESS: " + hostName + ":" + String.valueOf(port) + "\n=================================\n";
+        return hostName + ":" + String.valueOf(port) + "," + name  ;
+        //return "\n=================================\nID: " + String.valueOf(id) + "\nNAME: " + name + "\nADDRESS: " + hostName + ":" + String.valueOf(port) + "\n=================================\n";
     }
 
     public boolean equals(Node otherNode){

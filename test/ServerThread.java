@@ -28,9 +28,10 @@ class ServerThread implements Runnable
    {
        int charInt; // Integer form of byte from client (UTF8)
        int state = 0; // current NFA state
+       Node recieved;
 
        char charFromClient; // char form of byte from client (UTF8)
-
+       //System.out.println("Socket: " + socket.getLocalSocketAddress());
        try (
            PrintWriter out =
                new PrintWriter(socket.getOutputStream(), true);
@@ -40,16 +41,38 @@ class ServerThread implements Runnable
            ArrayList<String> buffer = new ArrayList<String>();
            String inputLine;
            while ((inputLine = in.readLine()) != null) {
-           // while ((inputLine = in.readLine()).equals("END: true")) {
-               // out.println(inputLine);
-               // System.out.println("recieved: " + inputLine);
-               //System.out.println("RECV: " + inputLine);
+
+               //System.out.println("Found OUT");
                buffer.add(inputLine);
+               System.out.println(inputLine);
+
            }
 
-           synchronized(this){
-               parseMessage(buffer);
+           recieved = parseMessage( buffer );
+
+           recieved.showValues();
+
+           if ( recieved.action.equals("JOIN") )
+           {
+               for (Node other:chat.connections)
+               {
+                   out.println(other.toString());
+               }
            }
+           else if ( recieved.action.equals("JOINED") )
+           {
+               chat.connections.add(recieved);
+           }
+           else if ( recieved.action.equals("LEAVE") )
+           {
+               chat.connections.remove(recieved);
+           }
+           else
+           {
+               System.out.println("[" + recieved.name + "] " + recieved.body );
+           }
+
+
 
        } catch (IOException e) {
            System.out.println("Exception caught when trying to listen on port or listening for a connection");
@@ -59,7 +82,7 @@ class ServerThread implements Runnable
    }
 
 
-   public void parseMessage(ArrayList<String> msg){
+   public Node parseMessage(ArrayList<String> msg){
        String line;
 
        String action = ""; // = msg.get(0).split(": ", 1)[1];
@@ -120,23 +143,7 @@ class ServerThread implements Runnable
            current = msg.get(index);
        }
 
-           Node newNode = new Node(id, name, senderIP, senderPort);
-
-           boolean foundCopy = false;
-
-           System.out.printf("%s: %s\n", name, body );
-           for (Node other:chat.connections){
-               if (newNode.equals(other)){
-                   foundCopy = true;
-                   System.out.println("FOUND");
-               }
-           }
-
-           if ( !(foundCopy) )
-           {
-               ChatNode.connections.add(newNode);
-           }
-
-
+       Node newNode = new Node(id, name, senderIP, senderPort, action, body);
+       return newNode;
    }
 }
