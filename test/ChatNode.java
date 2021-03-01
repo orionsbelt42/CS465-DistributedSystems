@@ -6,6 +6,7 @@ public class ChatNode
 {
 
     public static ArrayList<Node> connections = new ArrayList<Node>();
+    public static Node myData = new Node();
 
     String name;
 

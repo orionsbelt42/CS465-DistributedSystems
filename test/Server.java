@@ -5,6 +5,7 @@ public class Server extends Thread
 {
     int portNumber;
     public static ChatNode chat;
+    private int count = 0;
 
     Server(int port)
     {
@@ -16,19 +17,26 @@ public class Server extends Thread
     {
         //int portNumber = 8080; // default port number
 
-
+        boolean myDataIsSet = false;
 
         try (ServerSocket serverSocket = new ServerSocket(portNumber);)
         {
             System.out.println("Listening... server" +  serverSocket.getLocalSocketAddress());
             while(true)
             {
+                count += 1;
                 Socket socket = serverSocket.accept(); // wait for a connection
-                System.out.println("Socket: " + socket.getLocalSocketAddress());
-                //System.out.println("[Connected]");
+                if (!myDataIsSet)
+                {
+                    String[] myConnection = socket.getLocalSocketAddress().toString().substring(1).trim().split(":", -2);
+                    String host = myConnection[0];
 
-                // count = Thread.activeCount();
-                Runnable run = new ServerThread(socket); // create new Runnable
+                    chat.myData.hostName = host;
+                    chat.myData.port = portNumber;
+
+                    myDataIsSet = true;
+                }
+                Runnable run = new ServerThread(socket, count); // create new Runnable
                 Thread thread = new Thread(run); // assign Runnable to thread
                 thread.start(); // start the thread
 

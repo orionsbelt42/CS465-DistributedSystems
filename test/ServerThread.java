@@ -7,7 +7,7 @@ class ServerThread implements Runnable
 {
     //private final Lock queueLock = new ReentrantLock();
    private Socket socket; // system socket
-
+   private int number;
    InputStream fromClient; // stream for incoming data from client
    OutputStream toClient; // stream for outgoing data from server
 
@@ -16,10 +16,11 @@ class ServerThread implements Runnable
    ChatNode chat;
 
 
-   ServerThread(Socket newSocket)
+   ServerThread(Socket newSocket, int count)
    {
        // System.out.println("[Listening for new connection]");
        socket = newSocket;
+       number = count;
        //chat = calling;
    }
 
@@ -128,6 +129,10 @@ class ServerThread implements Runnable
             else if (incoming.action.equals("JOINED\n"))
             {
                 // Node(int newId, String newName, String newHostName, int newPortNumber)
+                if (incoming.name.equals(""))
+                {
+                    incoming.name = "Client " + number + "\n";
+                }
                 Node newNode = new Node( incoming.id, incoming.name, incoming.hostName, incoming.port );
                 chat.connections.add(newNode);
             }
