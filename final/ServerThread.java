@@ -71,6 +71,7 @@ class ServerThread implements Runnable
 
                 inputSpilt = inputLine.split(": ", -2);
 
+                // get values from recieved data
                 if (inputSpilt.length == 2){
                     switch( inputSpilt[0] )
                     {
@@ -104,7 +105,7 @@ class ServerThread implements Runnable
                             incoming.body = inputSpilt[1] + "\n";
                     }
                 }
-
+                // check for end of message
                 if (inputLine.equals("END: TRUE"))
                 {
                     break;
@@ -112,8 +113,10 @@ class ServerThread implements Runnable
 
             }
 
+            // handle message types
             if (incoming.action.equals("JOIN"))
             {
+                // return list of connections
                 out.println(ChatNode.myData.toString());
                 for (Node item: ChatNode.connections)
                 {
@@ -140,6 +143,7 @@ class ServerThread implements Runnable
             }
             else if (incoming.action.equals("LEAVE"))
             {
+                // remove connection no response needed
                 Node newNode = new Node( incoming.id, incoming.name, incoming.hostName, incoming.port );
                 ChatNode.connections.remove(newNode);
                 System.out.println("[" + incoming.name + " left the chat]");

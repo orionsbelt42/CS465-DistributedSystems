@@ -4,7 +4,7 @@ import java.util.*;
 
 public class ChatNode
 {
-
+    // store connections
     public static ArrayList<Node> connections = new ArrayList<Node>();
     public static Node myData = new Node();
 
@@ -13,14 +13,17 @@ public class ChatNode
 
     public static void main(String[] args) throws IOException, InterruptedException
     {
+        // set default values
         myData.port = 8080;
         String hostName = "127.0.0.1";
         int port;
 
+        // data type place holders
         Node initial;
         MSG join;
         MSG joined;
 
+        // get user input
         Scanner scan = new Scanner(System.in);
         System.out.println("Hello! Welcome to our chat, please enter your name: ");
         myData.name = scan.next();
@@ -30,50 +33,44 @@ public class ChatNode
         // MSG( Node connection, String msgAction, String msgBody )
         if (args.length == 2)
         {
+            // if args are passed use them to setup
             System.out.println("===============================================");
             System.out.println("  Setup");
             System.out.println("===============================================");
             hostName = args[0];
             port = Integer.parseInt(args[1]);
 
+            // create new messages
             initial = new Node(0, "", hostName, myData.port);
             join = new MSG( "JOIN" );
 
-
+            // send init join message
             sendMSG( join, initial );
 
             joined = new MSG( myData, "JOINED", "" );
 
+            // send follow up
             System.out.println("Sending joined MESSAGE");
             for (Node client: connections)
             {
                 sendMSG( joined, client );
             }
-            //sendMSG( join, initial );
 
 
         }
         else
         {
+            // let user know there are not other nodes
             System.out.println("\nYou're the first one here!\nWaiting for other nodes to connect");
 
         }
-
-        /*
-        else
-        {
-            System.out.println("Incorrect Arguments:\n\tExpected ChatNode hostName portNumber");
-            System.exit(1);
-        }
-        */
-
 
 
 
         int count = 0; // number of clients since server start
         int current; // number of current connections
 
-
+        // init and start server side of node
         Server thread = new Server(myData.port); // assign Runnable to thread
         thread.start(); // start the thread
 
@@ -81,7 +78,7 @@ public class ChatNode
         count++; // increment the total number of clients
 
 
-
+        // main loop prompt user for data and send to other nodes
         String userInput = "";
         MSG newMsg;
         System.out.println("Enter Message or type exit to quit: ");
@@ -90,6 +87,7 @@ public class ChatNode
             userInput = scan.next();
             System.out.println("Me: "+userInput);
 
+            // check that connection exists before sending
             if (connections.size() > 0){
                 newMsg = new MSG(myData, "MESSAGE", userInput);
                 for (Node client: connections)
@@ -100,6 +98,7 @@ public class ChatNode
 
 
         } while (!userInput.equals("exit") && !userInput.equals("exit\n"));
+        // follow exit path
         if (connections.size() > 0){
             newMsg = new MSG(myData, "LEAVE", "");
             for (Node client: connections)
@@ -107,6 +106,7 @@ public class ChatNode
                 sendMSG( newMsg, client );
             }
         }
+        // let user know and exit
         System.out.println("Exiting Chat");
         System.exit(1);
 
@@ -115,6 +115,7 @@ public class ChatNode
 
     public static void sendMSG(MSG packet, Node receiver )
     {
+        // creates new client and sends message for every node
         try (
             Socket socket = new Socket(receiver.hostName, receiver.port);
             PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
@@ -180,6 +181,8 @@ public class ChatNode
             out.println(packet.toString());
 
             socket.close();
+
+            // after sending close the socket
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + receiver.hostName);
             // System.exit(1);

@@ -24,6 +24,8 @@ public class Server extends Thread
         System.out.println("===============================================");
         System.out.println("  Chat");
         System.out.println("===============================================");
+
+        // setup server socket
         try (ServerSocket serverSocket = new ServerSocket(portNumber);)
         {
             //System.out.println("Listening... server" +  serverSocket.getLocalSocketAddress());
@@ -41,6 +43,7 @@ public class Server extends Thread
 
                     myDataIsSet = true;
                 }
+                // run a thread for each new connection
                 Runnable run = new ServerThread(socket, count); // create new Runnable
                 Thread thread = new Thread(run); // assign Runnable to thread
                 thread.start(); // start the thread
