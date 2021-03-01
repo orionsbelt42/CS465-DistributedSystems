@@ -117,68 +117,39 @@ class ServerThread implements Runnable
                 }
 
             }
-            /*
-            System.out.println(inputSpilt[0]);
-            System.out.println(inputSpilt[1]);
-            if (inputLine.equals("END: TRUE"))
-            {
-                System.out.println("");
-                break;
-            }
-            else if (inputLine.equals("ACTION: JOIN"))
+
+            if (incoming.action.equals("JOIN\n"))
             {
                 for (Node item: chat.connections)
                 {
                     out.println(item.toString());
                 }
             }
-            */
+            else if (incoming.action.equals("JOINED\n"))
+            {
+                // Node(int newId, String newName, String newHostName, int newPortNumber)
+                Node newNode = new Node( incoming.id, incoming.name, incoming.hostName, incoming.port );
+                chat.connections.add(newNode);
+            }
+            else if (incoming.action.equals("MESSAGE\n"))
+            {
+                System.out.println(incoming.name + ": " + incoming.body);
+            }
+            else if (incoming.action.equals("LEAVE\n"))
+            {
+                Node newNode = new Node( incoming.id, incoming.name, incoming.hostName, incoming.port );
+                chat.connections.remove(newNode);
+            }
+            else if (incoming.action.equals("UPDATE\n"))
+            {
+                Node newNode = new Node( incoming.id, incoming.name, incoming.hostName, incoming.port );
+                chat.connections.remove(newNode);
+                chat.connections.add(newNode);
+            }
+
+
             System.out.println("\n=============\n" + incoming.toString());
-            //System.out.println("\n-----------------------\n" + buffer2);
-           /*
-           while ((inputLine = in.readLine()) != null) {
 
-               //System.out.println("Found OUT");
-               buffer.add(inputLine);
-               System.out.println(inputLine);
-
-               if ( inputLine.equals("ACTION: JOIN") )
-               {
-                   for (Node other:chat.connections)
-                   {
-                       out.println(other.toString());
-                   }
-                   out.println("END: TRUE");
-                   break;
-               }
-
-           }
-
-
-           System.out.println("\n\nEXITED\n\n\n");
-
-
-           if (buffer.size() > 0)
-           {
-               recieved = parseMessage( buffer );
-
-               recieved.showValues();
-
-               if ( recieved.action.equals("JOINED") )
-               {
-                   chat.connections.add(recieved);
-               }
-               else if ( recieved.action.equals("LEAVE") )
-               {
-                   chat.connections.remove(recieved);
-               }
-               else
-               {
-                   System.out.println("[" + recieved.name + "] " + recieved.body );
-               }
-           }
-           */
-           parseMessage( buffer );
 
        } catch (IOException e) {
            System.out.println("Exception caught when trying to listen on port or listening for a connection");
