@@ -23,6 +23,8 @@ public class Node {
         name = "";
         hostName = "127.0.0.1";
         port = 9090;
+        action = "";
+        body = "";
     }
 
     Node(int newId, String newName, String newHostName, int newPortNumber){
@@ -30,6 +32,8 @@ public class Node {
         name = newName;
         hostName = newHostName;
         port = newPortNumber;
+        action = "";
+        body = "";
     }
 
     Node(int newId, String newName, String newHostName, int newPortNumber, String msgAction, String msgBody){

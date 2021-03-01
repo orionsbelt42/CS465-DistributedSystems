@@ -63,9 +63,7 @@ public class ChatNode
             temp++;
         }
         */
-        Thread.sleep(10000);
-        for (Node i:connections)
-        {System.out.println(i.toString());}
+
 
     }
 

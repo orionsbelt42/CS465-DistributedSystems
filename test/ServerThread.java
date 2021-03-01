@@ -23,6 +23,26 @@ class ServerThread implements Runnable
        //chat = calling;
    }
 
+   private String getBytes( InputStream in )
+   {
+       String buffer = "";
+       byte[] byteBuffer;
+
+       try {
+           while ( in.available() > 0 )
+           {
+               byteBuffer = new byte[in.available()];
+               in.read(byteBuffer);
+               buffer = buffer + new String(byteBuffer);
+           }
+           return buffer;
+       } catch (IOException e) {
+           System.out.println("Exception caught when trying to listen on port or listening for a connection");
+           System.out.println(e.getMessage());
+       }
+       return "";
+   }
+
    @Override
    public void run()
    {
@@ -38,41 +58,127 @@ class ServerThread implements Runnable
            BufferedReader in = new BufferedReader(
                new InputStreamReader(socket.getInputStream()));
        ) {
-           ArrayList<String> buffer = new ArrayList<String>();
-           String inputLine;
+            ArrayList<String> buffer = new ArrayList<String>();
+            String inputLine;
+            String[] inputSpilt;
+            String buffer2 = "";
+            MSG incoming = new MSG();
+            while ((inputLine = in.readLine()) != null) {
+            // while ((inputLine = in.readLine()).equals("END: true")) {
+                // out.println(inputLine);
+                System.out.println("recieved: " + inputLine);
+                // System.out.println("recieved: " + inputLine);
+                //System.out.println("RECV: " + inputLine);
+                buffer.add(inputLine);
+                //buffer2 += inputLine + "\n";
+
+
+                inputSpilt = inputLine.split(": ", -2);
+                if (inputSpilt.length == 2){
+                    switch( inputSpilt[0] )
+                    {
+                        case "ACTION":
+                            incoming.action = inputSpilt[1] + "\n";
+                            break;
+                        case "NAME":
+                            incoming.name = inputSpilt[1]  + "\n";
+                            break;
+                        case "SENDER":
+                            String[] temp = inputSpilt[1].split(" ", -2);
+                            incoming.hostName = temp[0]  + "\n";
+                            incoming.port = Integer.parseInt(temp[1]);
+                            break;
+                        case "ID":
+                            incoming.id = Integer.parseInt(inputSpilt[1]);
+                            break;
+                        case "END":
+                            if (inputSpilt[1].equals("TRUE"))
+                            {
+                                incoming.end = true;
+                            }
+                            else
+                            {
+                                incoming.end = false;
+                            }
+                            break;
+                        case "BODY":
+                            incoming.body = inputSpilt[1] + "\n";
+                    }
+                }
+                else
+                {
+                    incoming.body += inputLine + "\n";
+                }
+
+                if (inputLine.equals("END: TRUE"))
+                {
+                    System.out.println("");
+                    break;
+                }
+
+            }
+            /*
+            System.out.println(inputSpilt[0]);
+            System.out.println(inputSpilt[1]);
+            if (inputLine.equals("END: TRUE"))
+            {
+                System.out.println("");
+                break;
+            }
+            else if (inputLine.equals("ACTION: JOIN"))
+            {
+                for (Node item: chat.connections)
+                {
+                    out.println(item.toString());
+                }
+            }
+            */
+            System.out.println("\n=============\n" + incoming.toString());
+            //System.out.println("\n-----------------------\n" + buffer2);
+           /*
            while ((inputLine = in.readLine()) != null) {
 
                //System.out.println("Found OUT");
                buffer.add(inputLine);
                System.out.println(inputLine);
 
+               if ( inputLine.equals("ACTION: JOIN") )
+               {
+                   for (Node other:chat.connections)
+                   {
+                       out.println(other.toString());
+                   }
+                   out.println("END: TRUE");
+                   break;
+               }
+
            }
 
-           recieved = parseMessage( buffer );
 
-           recieved.showValues();
+           System.out.println("\n\nEXITED\n\n\n");
 
-           if ( recieved.action.equals("JOIN") )
+
+           if (buffer.size() > 0)
            {
-               for (Node other:chat.connections)
+               recieved = parseMessage( buffer );
+
+               recieved.showValues();
+
+               if ( recieved.action.equals("JOINED") )
                {
-                   out.println(other.toString());
+                   chat.connections.add(recieved);
+               }
+               else if ( recieved.action.equals("LEAVE") )
+               {
+                   chat.connections.remove(recieved);
+               }
+               else
+               {
+                   System.out.println("[" + recieved.name + "] " + recieved.body );
                }
            }
-           else if ( recieved.action.equals("JOINED") )
-           {
-               chat.connections.add(recieved);
-           }
-           else if ( recieved.action.equals("LEAVE") )
-           {
-               chat.connections.remove(recieved);
-           }
-           else
-           {
-               System.out.println("[" + recieved.name + "] " + recieved.body );
-           }
-
-
+           */
+           parseMessage( buffer );
 
        } catch (IOException e) {
            System.out.println("Exception caught when trying to listen on port or listening for a connection");
@@ -142,7 +248,9 @@ class ServerThread implements Runnable
            }
            current = msg.get(index);
        }
-
+       System.out.println("============================");
+       System.out.println("\nBody: " + body);
+       System.out.println("Action: "+action);
        Node newNode = new Node(id, name, senderIP, senderPort, action, body);
        return newNode;
    }
