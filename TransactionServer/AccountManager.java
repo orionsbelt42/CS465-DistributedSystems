@@ -1,6 +1,4 @@
-class AccountManager
-{
-	private Account[] accountList;
+private Account[] accountList;
 
 	public AccountManager( int numOfAccounts, int valueInAccounts )
 	{
@@ -32,12 +30,4 @@ class AccountManager
 	}
 
 	public void 
-
-	
-
-
-
-
-
-
 }
