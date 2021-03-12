@@ -12,3 +12,9 @@ public int read( int accountNumber, Transaction transaction ){
         ( TransactionServer.lockManager ).lock( account, transaction, READ_LOCK );
         return account.getBalance();
         }
+public void transcation(account1, account2, money){
+        print(" Opening tansaction...")
+        Account account = getAccount( account1 );
+        Account account = getAccount( account2 );
+        
+        }
