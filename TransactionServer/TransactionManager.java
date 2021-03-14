@@ -21,10 +21,10 @@ public class TransactionManager
 		return account.getBalance();
 	}
 
-	public void openTranscation(account1, account2, money)
+	public void openTranscation( Account account1, Account account2, double money)
 	{
-		print(" Opening tansaction...")
+		print(" Opening tansaction...");
 		Account account = getAccount( account1 );
-		Account account = getAccount( account2 );
+		Account secondAccount = getAccount( account2 );
 	}
 }

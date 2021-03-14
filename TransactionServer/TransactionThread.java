@@ -45,12 +45,14 @@ class TransactionThread implements Runnable
 
                 }
             }
-        }
-        // If there are problems, display the error and exit
-        catch (IOException ioExec) {System.err.println(ioExec);}
-        finally
-        {
-            System.out.println("Client " + count + " left the session."); // display client exit
+
+            // If there are problems, display the error and exit
+            catch (IOException ioExec)
+            { System.err.println(ioExec); } // display the io exception
+            
+            finally
+            {
+                System.out.println("Client " + count + " left the session."); // display client exit
+            }
         }
     }
-}
