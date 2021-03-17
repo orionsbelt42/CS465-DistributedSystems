@@ -1,9 +1,7 @@
-public class TransactionManager
+
+
+public class Transaction
 {
-	public ArrayList<Account> getAccounts()
-	{
-		return accounts;
-	}
 
 	public int write( int accountNumber, Transaction transaction )
 	{
@@ -20,10 +18,16 @@ public class TransactionManager
 		return account.getBalance();
 	}
 
-	public void openTranscation( Account account1, Account account2, double money)
+	public void openTranscation(account1, account2, money)
 	{
-		print(" Opening tansaction...");
+		print(" Opening tansaction...")
 		Account account = getAccount( account1 );
-		Account secondAccount = getAccount( account2 );
+		Account account = getAccount( account2 );
 	}
+
+	public void closeTransaction(transactionNum)
+	{
+		
+	}
+
 }
