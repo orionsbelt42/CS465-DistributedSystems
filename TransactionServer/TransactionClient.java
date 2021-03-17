@@ -39,7 +39,7 @@ public class TransactionClient
 
             while (true)
             {
-                system.out.println("Type 20000 to quit at any time")
+                system.out.println("Type 20000 to quit at any time");
                 system.outprintln("How many accounts do you want to create(integer values only)? ");
                 int accounts = scan.nextInt(); // get user input for accounts
                 system.outprintln("How much money do you want to put in each account(integer values only)? ");
