@@ -2,6 +2,7 @@
 public class Lock 
 {
 	private Object object;
+	// transactions that have lock
 	private Vector holders;
 	private LockType lockType;
 
