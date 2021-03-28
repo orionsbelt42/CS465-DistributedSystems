@@ -223,13 +223,11 @@ public class TransactionAPI {
     public int closeTransaction() {
         // Create and send CLOSE_TRANSACTION message to server
         
-        try {
-            send(writer.closeTransaction());
+
+        send(writer.closeTransaction());
             
-            connection.close();
-        } catch (IOException e) {
-            System.out.println("Error closing connection to server");
-        }
+        close();
+        
         return 0; // temp return stub
     }
     

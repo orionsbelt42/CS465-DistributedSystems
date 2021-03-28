@@ -52,7 +52,26 @@ public class TransactionClient
 
     }
     
-    
+    public void runTransaction(PropertyHandler configData) {
+         // initialize API object for the client
+        TransactionAPI transaction = new TransactionAPI(configData);
+        
+        ArrayList<Integer> accountIDs = transaction.openTransaction();
+        
+        Random rand = new Random();
+        
+        int sourceAcctIdx = rand.nextInt(accountIDs.size());
+        int destAcctIdx = rand.nextInt(accountIDs.size());
+        int transferAmount = rand.nextInt(100);
+        
+        while (sourceAcctIdx == destAcctIdx){
+            destAcctIdx = rand.nextInt(accountIDs.size());
+        }
+        
+        
+        
+        transaction.closeTransaction();
+    }
     /*
     Unsure if needed, possibly overwritten in API class
     private static int sendTransaction( int money,  int accounts, int transactions, OutputStream stream )
