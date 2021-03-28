@@ -1,7 +1,15 @@
+package transactionserver;
+
 public class TransID
 {
     private int transID;
 
+    public TransID()
+    {
+        transID = 0;
+    }
+    
+    
     public TransID(int idNum)
     {
         transID = idNum;

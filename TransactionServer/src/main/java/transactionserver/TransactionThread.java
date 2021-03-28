@@ -1,5 +1,9 @@
+package transactionserver;
+
 import java.io.*;
 import java.util.Scanner;
+
+// this is unnecessary for this project
 
 class TransactionThread implements Runnable
 {
@@ -10,7 +14,7 @@ class TransactionThread implements Runnable
     OutputStream toClient; // stream for outgoing data from server
 
 
-    EchoThread(Socket newSocket, int newCount)
+    TransactionThread(Socket newSocket, int newCount)
     {
         socket = newSocket; // assign server socket to local
         count = newCount; // copy thread number

@@ -3,76 +3,47 @@ package transactionclient;
 import java.io.*;
 import java.net.*;
 import java.util.Scanner;
+import utils.*;
 
 
 public class TransactionClient
 {
     public static void main(String[] args) throws IOException
     {
-        Socket socket = null; // socket here
+        String configFile = "TransactionClient.properties"; // default property file name
 
-        // get and parse connection arguments
-        int portNumber = 1234; // default port number
-        String hostname = "127.0.0.1"; // localhost
-
+        // if there is one arg passed when the program is loaded
         if ( args.length == 1 )
         {
-            hostname = args[0]; // get server hostname
+            configFile = args[0]; // get client properties file name as arg
         }
-        else if( args.length == 2 )
-        {
-            hostname = args[0]; // get server hostname
-            portNumber = Integer.parseInt(args[1]); // get server port number
-        }
-        else if ( args.length > 2 ) // prompt user if incorrect
-        {
-            System.out.println("Incorrect Arguments: <hostname> <port number>[default=8080]");
-            System.exit(1);
-        }
-
-        // setup connection to server
-        try
-        {
-            Socket newSocket = new Socket(hostname, portNumber); // connect to socket
-
-            InputStream fromServer = newSocket.getInputStream(); // stream from server
-            OutputStream toServer = newSocket.getOutputStream(); // stream to server
-
-            Scanner scan = new Scanner(System.in); // scanner obj for user input
-
-            while (true)
-            {
-                system.out.println("Type 20000 to quit at any time");
-                system.outprintln("How many accounts do you want to create(integer values only)? ");
-                int accounts = scan.nextInt(); // get user input for accounts
-                system.outprintln("How much money do you want to put in each account(integer values only)? ");
-                int money = scan.nextInt(); // get user input for accounts
-                system.outprintln("How many transactions do you want to perform(integer values only)? ");
-                int transactions = scan.nextInt(); // get user input for accounts
-                system.out.println("You want to make " + accounts + " accounts, each with $" + money + " and perform " + transactions + " transactions.");
-                String output = ""; // store output here
-
-                // get and store expected filtered length
-                int outputLen = sendBytes(money, accounts, transactions, toServer);
-
-                output = recvBytes( fromServer); // get and store output from server
-
-                if ( accounts == 20000 || transactions == 20000){ // if user types 2000 close connection
-                    break; // exit loop
-                }
-
-            }
-        }
-        catch (UnknownHostException e) // deal with any errors
-        {
-            System.err.println("Connection Failed: Unknown Host [" + hostname + "]");
-            System.exit(1);
-        }
-        catch (IOException e)
-        {
-            System.err.println("Couldn't connect to host [" + hostname + ":" + portNumber + "]");
-            System.exit(1);
-        }
+        
+        // read and store config data from server properties file
+        PropertyHandler configData = new PropertyHandler(configFile);
+        
+        // number of accounts on the server might be able to share on connect
+        int numberOfAccounts = Integer.parseInt(configData.getProperty("NUMBER_ACCOUNTS"));
+        
+        // number of transactions to create/request
+        int numberTrans = Integer.parseInt(configData.getProperty("NUMBER_TRANSACTIONS"));
+        
+        // the hostname/ip of the server
+        String hostname = configData.getProperty("SERVER_IP");
+        
+        // port that server is listening to
+        int port = Integer.parseInt(configData.getProperty("SERVER_PORT"));
+        
+        // initialize API object for the client
+        TransactionAPI transaction = new TransactionAPI(configData);
+        
+        // loop over number of transactions
+        
+            // create random transaction
+                // pick two random accounts 
+                
+                // pick random int value to transfer
+                
+            // use API to request transfer 
 
     }
 
