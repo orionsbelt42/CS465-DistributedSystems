@@ -1,6 +1,6 @@
 public class TransID
 {
-    private transID;
+    private int transID;
 
     public TransID(int idNum)
     {

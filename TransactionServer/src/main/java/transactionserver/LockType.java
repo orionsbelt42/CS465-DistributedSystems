@@ -1,32 +1,33 @@
-public enum lockname{ READ_LOCK, WRITE_LOCK, EMPTY_LOCK }
+package transactionserver;
+
 
 public class LockType 
 {
-    private lockname lock;
+    private LockName lock;
 
-    public LockType(lockname newlock)
+    public LockType(LockName newlock)
     {
-        newlock;
+        lock = newlock;
     }
 
-    public promote()
+    public void promote()
     {
-        if( lock == READ_LOCK )
-        {
-            lock = WRITE_LOCK;
-        }
-        else if( lock == EMPTY_LOCK )
-        {
-            lock = READ_LOCK;
-        }
-        else // WRITE_LOCK cannot be promoted; redefine as self
-        {
-            lock = WRITE_LOCK;
+        switch (lock) {
+            case READ_LOCK:
+                lock = LockName.WRITE_LOCK;
+                break;
+            case EMPTY_LOCK:
+                lock = LockName.READ_LOCK;
+                break;
+            case WRITE_LOCK:
+                lock = LockName.WRITE_LOCK;
+                break;
+                
         }
     }
 
     public void breakLock()
     {
-        lock = NULL;
+        lock = null;
     }
 }

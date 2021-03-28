@@ -1,43 +1,48 @@
 import java.net.*;
 import java.io.*;
+import utils.*;
 
 public class TransactionServer
 {
+    
     public static void main(String[] args) throws IOException
     {
-        int portNumber = 1234; // default port number
+        String configFile = "TransactionServer.properties"; // default port number
 
         if ( args.length == 1 )
         {
-            portNumber = Integer.parseInt(args[0]); // get port number as arg
-        }
-        else if ( args.length > 1 ) // if they mess up and give too many args
-        {
-            // prompt user for correction
-            System.out.println("Incorrect Arguments Entered: <port number>[default=8080]");
-            System.exit(1); // exit
+            configFile = args[0]; // get server properties file name as arg
         }
 
-        int count = 0; // number of clients since server start
-        int current; // number of current connections
-
-        try (ServerSocket serverSocket = new ServerSocket(portNumber);)
+        PropertyHandler configData = new PropertyHandler(configFile);
+        
+        String hostname = configData.getProperty("HOST");
+        int port = Integer.parseInt(configData.getProperty("PORT"));
+        
+        int numberOfAccounts = Integer.parseInt(configData.getProperty("NUMBER_ACCOUNTS"));
+        int initialBalance = Integer.parseInt(configData.getProperty("INITIAL_BALANCE"));
+        
+        
+        // create TransactionManager here
+            
+        // create LockManager here
+        
+        // create AccountManager here
+            // pass number of accts + initial balance
+            
+        // create ServerSocket here
+        
+        try (ServerSocket serverSocket = new ServerSocket(port);)
         {
-            System.out.println("Listening...");
+            System.out.println("[TransactionServer.TransactionServer] ServerSocket created");
 
             while(true)
             {
                 Socket socket = serverSocket.accept(); // wait for a connection
-                count++; // increment the total number of clients
 
-                // count = Thread.activeCount();
-                Runnable run = new TransactionThread(socket, count); // create new Runnable
-                Thread thread = new Thread(run); // assign Runnable to thread
-                thread.start(); // start the thread
-
-                current = Thread.activeCount() - 1;
-                // show number of users currently connected
-                System.out.println("Clients connected: " + current);
+                // pass connection to TransactionManager to spawn TransactionManagerThread
+                
+                
             }
         }
     }
