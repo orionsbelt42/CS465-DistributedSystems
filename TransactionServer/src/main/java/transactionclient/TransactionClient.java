@@ -2,7 +2,7 @@ package transactionclient;
 
 import java.io.*;
 import java.net.*;
-import java.util.Scanner;
+import java.util.*;
 import utils.*;
 
 
@@ -36,6 +36,11 @@ public class TransactionClient
         // initialize API object for the client
         TransactionAPI transaction = new TransactionAPI(configData);
         
+        
+        ArrayList<Integer> accounts = transaction.openTransaction();
+        
+        System.out.println(accounts.toString());
+        transaction.closeTransaction();
         // loop over number of transactions
         
             // create random transaction
