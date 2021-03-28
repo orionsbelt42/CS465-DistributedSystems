@@ -11,13 +11,50 @@ public class TransactionManager
     
     TransID lastID = new TransID();
     
-    public TransactionManager() {
-        // what do we do here?
-    }
-    
     public class TransactionManagerWorker implements Runnable {
         
+        Socket connection;
+        InputStream fromClient;
+        OutputStream toClient;
         
+        public TransactionManagerWorker(Socket socket) {
+            connection = socket;
+            fromClient = connection.getInputStream();
+            toClient = connection.getOutputStream();
+        }
+        
+        /**
+         * primitive function to send simple text to a server
+         * (might change)
+         * 
+         * @param MSG utf-8 encoded string to send
+         */
+        private void send(byte[] MSG) {
+            try {
+                // convert message to bytes and send to server
+                this.toClient.write(MSG);
+            } catch (IOException e) {
+                System.err.println("Couldn't send message to Client");
+            }
+            
+        }
+        
+        private String recv() {
+            String buffer = "";
+            char current;
+            try {
+                current = (char)fromClient.read();
+                while (current != '\n') {
+                    buffer += current;
+                    current = (char)fromClient.read();
+                }
+            } catch (IOException e) {
+                System.out.println("Error while reading from socket");
+            }
+            
+            return buffer;
+        }
+
         @Override
         public void run() {
             // recv and verify first message
@@ -38,6 +75,11 @@ public class TransactionManager
         }
         
     }
+    
+    public TransactionManager() {
+        // what do we do here?
+    }
+    
     public TransactionManager() {
         this.transactionList = new ArrayList<Transaction>();
     }
