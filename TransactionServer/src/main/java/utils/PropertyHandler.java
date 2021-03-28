@@ -1,8 +1,8 @@
 package utils;
-​
+
 import java.util.*;
 import java.io.*;
-​
+
 /**
  * class [PropertyHandler]
  * <p>
@@ -12,9 +12,9 @@ import java.io.*;
  * @version Feb. 2000
  */
 public class PropertyHandler extends Properties {
-​
+
     File propertyFile = null;
-​
+
     /**
      * constructor
      * @param defaultProperties
@@ -22,17 +22,18 @@ public class PropertyHandler extends Properties {
      * @throws java.io.FileNotFoundException
      */
     public PropertyHandler(Properties defaultProperties, String propertyFileString) throws FileNotFoundException, IOException {
-​
+
         super(defaultProperties);
         // System.out.println("[PropertyHandler.PropertyHandler] Property handler called on " + propertyFileString);
-​
+
         propertyFile = getPropertyFile(propertyFileString);
-​
+
         InputStream is = new BufferedInputStream(new FileInputStream(propertyFile));
         this.load(is);
         is.close();
+        
     }
-​
+
     /**
      * constructor
      * @param propertyFileString
@@ -42,7 +43,7 @@ public class PropertyHandler extends Properties {
             throws FileNotFoundException, IOException {
         this(null, propertyFileString);
     }
-​
+
     /**
      * This is the important method reading the properties.
      * @return 
@@ -52,42 +53,50 @@ public class PropertyHandler extends Properties {
         // System.out.print("PropertyHandler.getProperty(\"" + key + "\")");
         String value = super.getProperty(key);
 		// System.out.println(" --> " + value);
-​
+
         return value;
     }
-​
+
     /**
      * Looks for a valid properties file ...
      */
     private File getPropertyFile(String propertyFileString)
             throws FileNotFoundException, IOException {
-​
+
         // ... in the current directory
         if ((propertyFile = new File(propertyFileString)).exists()) {
             return propertyFile;
         }
-​
+
         // ... in the directory, where the program was started
         String dirString = System.getProperty("user.dir");
         String completeString = dirString + File.separator + propertyFileString;
         if ((propertyFile = new File(completeString)).exists()) {
             return propertyFile;
         }
-​
+        String extraPath = "src" + File.separator + "main" + File.separator + 
+                           "java" + File.separator + "utils" + File.separator;
+        
+        String altDir = dirString + File.separator + extraPath + propertyFileString;
+        if ((propertyFile = new File(altDir)).exists()) {
+            return propertyFile;
+        }
+        
+
         // ... in Home-directory of the user
         dirString = System.getProperty("user.home");
         completeString = dirString + File.separator + propertyFileString;
         if ((propertyFile = new File(completeString)).exists()) {
             return propertyFile;
         }
-​
+
         // ... in the directory where Java keeps its own property files
         dirString = System.getProperty("java.home") + File.separator + "lib";
         completeString = dirString + File.separator + propertyFileString;
         if ((propertyFile = new File(completeString)).exists()) {
             return propertyFile;
         }
-​
+
         // ... in all directories specified by the CLASSPATH
         String[] classPathes = FileUtils.getClassPathes();
         for (int i = 0; i < classPathes.length; i++) {
@@ -96,7 +105,8 @@ public class PropertyHandler extends Properties {
                 return propertyFile;
             }
         }
-​
+        
+
         throw new FileNotFoundException("[PropertyHandler.PropertyHandler]Configuration file \"" + propertyFileString + "\" not found!");
     }
 }

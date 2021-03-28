@@ -24,3 +24,4 @@ Test.java
 
 .DS_Store
 
+/TransactionServer/target/
