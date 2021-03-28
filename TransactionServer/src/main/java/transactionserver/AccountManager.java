@@ -1,7 +1,7 @@
 package transactionserver;
 
-import java.util.ArrayList;
-import transactionserver.TransactionServer;
+import java.util.*;
+import static transactionserver.LockName.*;
 
 
 public class AccountManager
@@ -71,7 +71,7 @@ public class AccountManager
         // get the account matching the id
         Account account = getAccount( accountNumber );
         // lock the account for writing so no other transactions can read/write it 
-        ( TransactionServer.lockManager ).lock( account, transaction, WRITE_LOCK );
+        ( TransactionServer.lockManager ).setLock( account, transaction, WRITE_LOCK );
         // with lock set, update the account balance
         account.setBalance( balance );
         // return the updated balance
@@ -90,7 +90,7 @@ public class AccountManager
         // get the account matching the id 
         Account account = getAccount( accountNumber );
         // lock the account for reading 
-        ( TransactionServer.lockManager ).lock( account, transaction, READ_LOCK );
+        ( TransactionServer.lockManager ).setLock( account, transaction, READ_LOCK );
         // after locking, read and return account balance 
         return (getAccount( accountNumber )).getBalance();
     }

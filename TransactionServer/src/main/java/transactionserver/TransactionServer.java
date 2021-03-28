@@ -6,6 +6,8 @@ import utils.*;
 
 public class TransactionServer
 {
+    // create LockManager here
+    public static LockManager lockManager = new LockManager(); // need to work on this class still
     
     public static void main(String[] args) throws IOException
     {
@@ -35,9 +37,6 @@ public class TransactionServer
         
         // create TransactionManager here
         TransactionManager transManager = new TransactionManager(); // need to work on this class still
-        
-        // create LockManager here
-        LockManager lockManager = new LockManager(); // need to work on this class still
         
         // create AccountManager here
             // pass number of accts + initial balance

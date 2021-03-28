@@ -46,7 +46,10 @@ public class TransactionClient
             // use API to request transfer 
 
     }
-
+    
+    
+    /*
+    Unsure if needed, possibly overwritten in API class
     private static int sendTransaction( int money,  int accounts, int transactions, OutputStream stream )
     {
         try
@@ -110,5 +113,6 @@ public class TransactionClient
 
         return buffer;
     }
+*/
 
 }
