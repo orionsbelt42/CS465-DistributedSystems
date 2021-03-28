@@ -13,6 +13,10 @@ public class MessageReader {
         arguments = new ArrayList<String>();
     }
     
+    public ArrayList<String> parseMessage(byte[] message) {
+        return parseMessage(new String(message));
+    }
+    
     public ArrayList<String> parseMessage(String message) {
         
         message = message.replaceAll("\\s", "");

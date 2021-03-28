@@ -10,6 +10,7 @@ import transactionserver.Account;
 
 public class MessageWriter {
     int ID;
+    
     public MessageWriter( int transactionID ) {
         this.ID = transactionID;
     }
@@ -32,10 +33,6 @@ public class MessageWriter {
     public byte[] writeResponse(int accountID, int balance) {
         String msg = "WRITE_RESPONSE: " + ID + ", " + accountID + ", " + balance + "\n";
         return msg.getBytes();
-    }
-    
-    public byte[] openTransaction() {
-        return "OPEN_TRANSACTION: null\n".getBytes();
     }
     
     public byte[] closeTransaction() {
