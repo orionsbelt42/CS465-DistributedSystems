@@ -28,4 +28,8 @@ public class Account
     public int getBalance() {
         return accountTotal;
     }
+    
+    public int getID() {
+        return ID;
+    }
 }
