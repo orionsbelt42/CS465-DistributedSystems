@@ -12,6 +12,7 @@ public class TransactionServer
     public static void main(String[] args) throws IOException
     {
         String configFile = "TransactionServer.properties"; // default property file name
+        String logFile = "server_log.txt";
 
         // if there is one arg passed when the program is loaded
         if ( args.length == 1 )
@@ -36,7 +37,7 @@ public class TransactionServer
         boolean transView = Boolean.parseBoolean(configData.getProperty("TRANSACTION_VIEW"));
         
         // create TransactionManager here
-        TransactionManager transManager = new TransactionManager(); // need to work on this class still
+        TransactionManager transManager = new TransactionManager(logFile); // need to work on this class still
         
         // create AccountManager here
             // pass number of accts + initial balance

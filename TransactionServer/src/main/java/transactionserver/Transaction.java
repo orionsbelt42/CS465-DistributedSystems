@@ -7,43 +7,34 @@ public class Transaction
    int transactionID;
 
    // list of locks
-   ArrayList listOfLocks;
+   private static ArrayList<Lock> listOfLocks;
 
    // logging information
    int loggingInfo;
 
-   // create instantiation 
-   public Transaction( int ID, ArrayList list, int logInfo)
+    /**
+     * Class Constructor 
+     * 
+     * @param ID the ID number of the transaction
+     * @param logInfo the logging information of the transaction
+     */
+   public Transaction( int ID, int logInfo)
    {
-	   transactionID = ID;
-	   listOfLocks = list;
+      // allocate memory for a new list of locks
+      listOfLocks = new ArrayList<Lock>();
+
+      // set the transaction id
+      transactionID = ID;
+      
+      // set the logging
 	   loggingInfo = logInfo;
    }
 
-//    public int write( int accountNumber, Transaction transaction )
-//    {
-//        Account account = getAccount( accountNumber );
-//        ( TransactionServer.lockManager ).lock( account, transaction, WRITE_LOCK );
-//        account.setBalance( balance );
-//        return balance;
-//    }
-//
-//    public int read( int accountNumber, Transaction transaction )
-//    {
-//        Account account = getAccount( accountNumber );
-//        ( TransactionServer.lockManager ).lock( account, transaction, READ_LOCK );
-//        return account.getBalance();
-//    }
-//
-//    public void openTranscation(account1, account2, money)
-//    {
-//        print(" Opening tansaction...")
-//        Account account = getAccount( account1 );
-//        Account account = getAccount( account2 );
-//    }
-//
-//    public void closeTransaction(transactionNum)
-//    {
-//
-//    }
+   public int getTID(){
+      return transactionID;
+   }
+
+   public ArrayList<Lock> getLockList(){
+      return listOfLocks;
+   }
 }

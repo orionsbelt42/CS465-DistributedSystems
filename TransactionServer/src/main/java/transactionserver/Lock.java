@@ -4,12 +4,21 @@ import java.util.*;
 
 public class Lock 
 {
-    private Object object;
+    private Account object;
     // transactions that have lock
     private Vector holders;
     private LockType lockType;
 
-    public synchronized void acquire( TransID trans, LockType aLockType){
+    public Lock( Account acct ){
+        object = acct;
+    }
+    
+    
+    public Account getObject() {
+        return object;
+    }
+
+    public synchronized void acquire( Transaction trans, LockType aLockType){
         while(/*another transaction holds lock in conflicting mode*/) {
             try{
                 wait();
@@ -35,7 +44,7 @@ public class Lock
         }
     }
 
-    public synchronized void release(TransID trans)
+    public synchronized void release(Transaction trans)
     {
         holders.removeElement(trans);
         //set lockType to none

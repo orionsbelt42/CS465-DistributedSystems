@@ -31,3 +31,4 @@ public class LockType
         lock = null;
     }
 }
+        

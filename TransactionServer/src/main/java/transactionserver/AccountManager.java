@@ -1,6 +1,4 @@
 package transactionserver;
-
-import java.util.*;
 import static transactionserver.LockName.*;
 
 
@@ -98,7 +96,7 @@ public class AccountManager
     // I don't think this is needed here
     public void openTranscation( Account account1, Account account2, double money)
     {
-        print(" Opening tansaction...");
+        System.out.println(" Opening tansaction...");
         Account account = getAccount( account1 );
         Account secondAccount = getAccount( account2 );
     }

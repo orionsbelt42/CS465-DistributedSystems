@@ -9,18 +9,36 @@ public class TransactionManager
 {
     static ArrayList<Transaction> transactionList;
     
-    TransID lastID = new TransID();
     
     public class TransactionManagerWorker implements Runnable {
         
         Socket connection;
         InputStream fromClient;
         OutputStream toClient;
-        
-        public TransactionManagerWorker(Socket socket) {
-            connection = socket;
-            fromClient = connection.getInputStream();
-            toClient = connection.getOutputStream();
+        Transaction transaction;
+        int ID;
+
+        MessageReader reader;
+        MessageWriter writer;
+
+        ArrayList<Accounts> accounts;
+
+ 
+
+        public TransactionManagerWorker(Socket socket, AccountManager acctManager) {
+            this.connection = socket;
+            this.fromClient = connection.getInputStream();
+            this.toClient = connection.getOutputStream();
+
+            
+            this.ID = transaction.getTID();
+            TransactionManager.lastID = this.ID;
+
+            reader = new MessageReader();
+            writer = new MessageWriter(ID);
+
+            this.accounts = acctManager.getAccounts();
+
         }
         
         /**
@@ -38,6 +56,7 @@ public class TransactionManager
             }
             
         }
+        
         
         private String recv() {
             String buffer = "";
@@ -58,9 +77,15 @@ public class TransactionManager
         @Override
         public void run() {
             // recv and verify first message
-           
+            String msg = recv();
+
+            if (msg.equals("OPEN_TRANSACTION: null")) {
+                send(writer.transactionResponse(accounts));
+            }
+
+
             // create transaction object
-            
+            transaction = new Transaction(ID, logInfo)
             // assign id to transaction object
             
             // add transaction to list of transactions held by manager
@@ -76,12 +101,9 @@ public class TransactionManager
         
     }
     
-    public TransactionManager() {
-        // what do we do here?
-    }
-    
-    public TransactionManager() {
+    public TransactionManager(String logFile) {
         this.transactionList = new ArrayList<Transaction>();
+
     }
     
 //        public int write( int accountNumber, Transaction transaction )
