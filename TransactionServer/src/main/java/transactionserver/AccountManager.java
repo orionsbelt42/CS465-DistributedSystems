@@ -1,5 +1,6 @@
 package transactionserver;
 import static transactionserver.LockName.*;
+import java.util.ArrayList;
 
 
 public class AccountManager
@@ -68,8 +69,12 @@ public class AccountManager
     {
         // get the account matching the id
         Account account = getAccount( accountNumber );
+        
+        // create variable for lock type
+        LockType lockType = new LockType(WRITE_LOCK);
+        
         // lock the account for writing so no other transactions can read/write it 
-        ( TransactionServer.lockManager ).setLock( account, transaction, WRITE_LOCK );
+        ( TransactionServer.lockManager ).setLock( account, transaction, lockType );
         // with lock set, update the account balance
         account.setBalance( balance );
         // return the updated balance
@@ -87,8 +92,12 @@ public class AccountManager
     {
         // get the account matching the id 
         Account account = getAccount( accountNumber );
+        
+        // create variable for lock type
+        LockType lockType = new LockType(READ_LOCK);
+        
         // lock the account for reading 
-        ( TransactionServer.lockManager ).setLock( account, transaction, READ_LOCK );
+        ( TransactionServer.lockManager ).setLock( account, transaction, lockType);
         // after locking, read and return account balance 
         return (getAccount( accountNumber )).getBalance();
     }
@@ -97,7 +106,7 @@ public class AccountManager
     public void openTranscation( Account account1, Account account2, double money)
     {
         System.out.println(" Opening tansaction...");
-        Account account = getAccount( account1 );
-        Account secondAccount = getAccount( account2 );
+        Account account = getAccount( account1.getID() );
+        Account secondAccount = getAccount( account2.getID() );
     }
 }
