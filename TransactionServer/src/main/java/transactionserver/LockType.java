@@ -5,11 +5,19 @@ public class LockType
 {
     private LockName lock;
 
+    public LockType()
+    {
+        lock = LockName.EMPTY_LOCK;
+    }
+    
     public LockType(LockName newlock)
     {
         lock = newlock;
     }
 
+    /**
+     * function to promote lock
+     */
     public void promote()
     {
         switch (lock) {
@@ -26,9 +34,13 @@ public class LockType
         }
     }
 
-    public void breakLock()
+    public void clearLock()
     {
-        lock = null;
+        lock = LockName.EMPTY_LOCK;
+    }
+    
+    public LockName getLock() {
+        return lock;
     }
 }
         

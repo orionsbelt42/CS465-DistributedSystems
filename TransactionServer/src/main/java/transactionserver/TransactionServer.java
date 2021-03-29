@@ -51,10 +51,11 @@ public class TransactionServer
             while(true)
             {
                 Socket socket = serverSocket.accept(); // wait for a connection
-
+                TransactionManager.TransactionManagerWorker workerThread = transManager.new TransactionManagerWorker(socket, acctManager);
                 // pass connection to TransactionManager to spawn TransactionManagerThread
                 
-                
+                Thread thread = new Thread(workerThread); // assign Runnable to thread
+                thread.start(); // start the thread
             }
         } catch (IOException e) {
             System.out.println("Error trying to open server socket on " + hostname + ":" + port);

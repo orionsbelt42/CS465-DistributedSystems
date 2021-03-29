@@ -50,7 +50,6 @@ public class TransactionAPI {
     public TransactionAPI(PropertyHandler properties) {
         this.config = properties;
         this.hostname = properties.getProperty("SERVER_IP");
-        System.out.println("\nOUTPUT: " + properties.getProperty("SERVER_PORT"));
         this.port = Integer.parseInt(properties.getProperty("SERVER_PORT"));
         this.reader = new MessageReader();
         
@@ -113,13 +112,13 @@ public class TransactionAPI {
         }
         catch (UnknownHostException e) // deal with any errors
         {
-            System.err.println("Connection Failed: Unknown Host [" + hostname + "]");
+            System.out.println("Connection Failed: Unknown Host [" + hostname + "]");
             // return failure outcome
             return FAILURE_FLAG;
         }
         catch (IOException e)
         {
-            System.err.println("Couldn't connect to host [" + hostname + ":" + port + "]");
+            System.out.println("Couldn't connect to host [" + hostname + ":" + port + "]");
             // return failure outcome
             return FAILURE_FLAG;
         }
@@ -138,7 +137,7 @@ public class TransactionAPI {
             // return success outcome
             return SUCCESS_FLAG;
         } catch (IOException e) {
-            System.err.println("Couldn't close connection to host [" + hostname + ":" + port + "]");
+            System.out.println("Couldn't close connection to host [" + hostname + ":" + port + "]");
             // return failure outcome
             return FAILURE_FLAG;
         }
@@ -155,11 +154,15 @@ public class TransactionAPI {
             // convert message to bytes and send to server
             this.toServer.write(MSG);
         } catch (IOException e) {
-            System.err.println("Couldn't send message to host [" + hostname + ":" + port + "]");
+            System.out.println("Couldn't send message to host [" + hostname + ":" + port + "]");
         }
         
     }
     
+    /**
+     * function to listen for server messages
+     * @return 
+     */
     private String recv() {
         String buffer = "";
         char current;
@@ -196,7 +199,7 @@ public class TransactionAPI {
         
         // listen for the transaction id response from server
         String recieved = recv();
-        System.out.println("RECV: " + recieved);
+        
         response = reader.parseMessage(recieved);
         
         transactionID = Integer.parseInt(response.get(1));
@@ -236,12 +239,12 @@ public class TransactionAPI {
      * @param account
      * @return the outcome of the request
      */
-    public ArrayList<String> read(int account) {
+    public int read(int account) {
         // Create and send READ_REQUEST message to server
  
         send(writer.readRequest(account));
             
-        return reader.parseMessage(recv());
+        return Integer.parseInt(reader.parseMessage(recv()).get(2));
         
         // not sure if server will send response so go off no error?
     }

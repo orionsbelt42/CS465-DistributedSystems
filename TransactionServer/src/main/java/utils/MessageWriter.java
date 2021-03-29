@@ -52,7 +52,7 @@ public class MessageWriter {
         }
         
         for (index = 0; index < size; index++) {
-            buffer += accounts.get(index);
+            buffer += (accounts.get(index)).getID();
             
             if (index < size - 1) {
                 buffer += ", ";
