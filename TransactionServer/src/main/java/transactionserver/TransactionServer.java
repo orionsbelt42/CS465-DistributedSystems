@@ -9,6 +9,9 @@ public class TransactionServer
     // create LockManager here
     public static LockManager lockManager = new LockManager(); // need to work on this class still
     
+    public static SystemLog log = new SystemLog("server.log");
+    public static SystemLog deadlockLog = new SystemLog("deadlocks.log");
+    
     public static void main(String[] args) throws IOException
     {
         String configFile = "TransactionServer.properties"; // default property file name
@@ -47,18 +50,21 @@ public class TransactionServer
         try (ServerSocket serverSocket = new ServerSocket(port);)
         {
             System.out.println("[TransactionServer.TransactionServer] ServerSocket created");
-
+            int count = 0;
             while(true)
             {
                 Socket socket = serverSocket.accept(); // wait for a connection
-                TransactionManager.TransactionManagerWorker workerThread = transManager.new TransactionManagerWorker(socket, acctManager);
+                TransactionManager.TransactionManagerWorker workerThread = transManager.new TransactionManagerWorker(socket, acctManager, count);
                 // pass connection to TransactionManager to spawn TransactionManagerThread
-                
+                count++;
                 Thread thread = new Thread(workerThread); // assign Runnable to thread
                 thread.start(); // start the thread
             }
         } catch (IOException e) {
             System.out.println("Error trying to open server socket on " + hostname + ":" + port);
         }
+        
+        log.write("======================================= BRANCH TOTAL =======================================");
+        log.write("--->  " + acctManager.getBranchTotal());
     }
 }

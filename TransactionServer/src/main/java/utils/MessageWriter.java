@@ -10,32 +10,44 @@ import transactionserver.Account;
 
 public class MessageWriter {
     int ID;
+    boolean log;
     
     public MessageWriter( int transactionID ) {
         this.ID = transactionID;
+        this.log = false;
+    }
+    
+    public MessageWriter( int transactionID, boolean logValue ) {
+        this.ID = transactionID;
+        this.log = false;//logValue;
     }
     
     public byte[] readRequest(int accountID) {
         String msg = "READ_REQUEST: " + ID + ", " + accountID + "\n";
+        logMsg(msg);
         return msg.getBytes();
     }
     
     public byte[] readResponse(int accountID, int balance) {
         String msg = "READ_RESPONSE: " + ID + ", " + accountID + ", " + balance + "\n";
+        logMsg(msg);
         return msg.getBytes();
     }
     
     public byte[] writeRequest(int accountID, int amount) {
         String msg = "WRITE_REQUEST: " + ID + ", " + accountID + ", " + amount + "\n";
+        logMsg(msg);
         return msg.getBytes();
     }
     
     public byte[] writeResponse(int accountID, int balance) {
         String msg = "WRITE_RESPONSE: " + ID + ", " + accountID + ", " + balance + "\n";
+        logMsg(msg);
         return msg.getBytes();
     }
     
     public byte[] closeTransaction() {
+        logMsg("Sent Message: CLOSE_TRANSACTION: null\n");
         return "CLOSE_TRANSACTION: null\n".getBytes();
     } 
     
@@ -47,9 +59,6 @@ public class MessageWriter {
         if (size > 0) {
             buffer += ", ";
         }
-        else {
-            buffer += "\n";
-        }
         
         for (index = 0; index < size; index++) {
             buffer += (accounts.get(index)).getID();
@@ -57,11 +66,21 @@ public class MessageWriter {
             if (index < size - 1) {
                 buffer += ", ";
             }
-            else {
-                buffer += "\n";
-            }
         }
+        
+        buffer += "\n";
+        logMsg(buffer);
         return buffer.getBytes();
+    }
+    
+    public void setLog(boolean value){
+        log = value;
+    }
+    
+    public void logMsg(String msg){
+        if (log) {
+            System.out.print("Sent Message: " + msg);
+        }
     }
     
 }

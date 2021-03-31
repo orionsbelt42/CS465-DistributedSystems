@@ -9,6 +9,7 @@ import utils.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import transactionserver.AccountManager;
 
 /**
  *
@@ -51,7 +52,7 @@ public class TransactionAPI {
         this.config = properties;
         this.hostname = properties.getProperty("SERVER_IP");
         this.port = Integer.parseInt(properties.getProperty("SERVER_PORT"));
-        this.reader = new MessageReader();
+        this.reader = new MessageReader(true);
         
         hasHostAddr = true;
         
@@ -204,8 +205,8 @@ public class TransactionAPI {
         
         transactionID = Integer.parseInt(response.get(1));
         
-        writer = new MessageWriter(transactionID);
-        
+        writer = new MessageWriter(transactionID, true);
+        TransactionClient.log.write("transaction #" + transactionID + " started");
         response.remove(0);
         response.remove(0);
         
@@ -225,9 +226,9 @@ public class TransactionAPI {
     public int closeTransaction() {
         // Create and send CLOSE_TRANSACTION message to server
         
-
+        System.out.println("TRANSACTION CLOSE");
         send(writer.closeTransaction());
-            
+        TransactionClient.log.write("transaction #" + transactionID + " finished");
         close();
         
         return 0; // temp return stub
@@ -256,12 +257,16 @@ public class TransactionAPI {
      * @param amount the amount to write to that account 
      * @return the outcome of the request
      */
-    public ArrayList<String> write(int account, int amount) {
+    public int write(int account, int amount) {
+        ArrayList<String> response;
+        
         // Create and send WRITE_REQUEST message to server
         send(writer.writeRequest(account, amount));
-            
-        return reader.parseMessage(recv());
+        
+        response = reader.parseMessage(recv());
         // not sure if server will send response so go off no error?
+
+        return Integer.parseInt(response.get(3));
     }
     
     public int getTransID() {

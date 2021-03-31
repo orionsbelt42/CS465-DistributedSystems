@@ -8,6 +8,7 @@ import utils.*;
 
 public class TransactionClient
 {
+    public static SystemLog log = new SystemLog("client.log");
     
     public static void main(String[] args) throws IOException
     {
@@ -26,13 +27,26 @@ public class TransactionClient
         int numTransactions = Integer.parseInt(configData.getProperty("NUMBER_TRANSACTIONS"));
 
         Proxy ops;
+        Thread[] working = new Thread[numTransactions];
+        
         for (int transNum = 0; transNum < numTransactions; transNum++){
             ops = new Proxy(configData);
             Thread thread = new Thread(ops);
             thread.start();
+            
+            working[transNum] = thread;
         }
-             
-
+        
+        
+        for (Thread thread : working) {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                System.out.println("Error Joining thread " + thread.getName());
+            }
+        }
+        
+        log.close();
     }
     
 }

@@ -9,6 +9,7 @@ public class AccountManager
     private static int numberOfAccounts; // total number of accounts
     private static int initialBalance; // the initial balance for each account
 
+    public static final int DEADLOCK = -99999999;
     /**
      * Class Constructor 
      * 
@@ -75,8 +76,17 @@ public class AccountManager
         
         // lock the account for writing so no other transactions can read/write it 
         ( TransactionServer.lockManager ).setLock( account, transaction, lockType );
+        
+        // check for deadlock before modifying balance
+        if (transaction.isDeadlocked()) {
+            System.out.println("HELLO");
+            return DEADLOCK;
+        }
+        
         // with lock set, update the account balance
         account.setBalance( balance );
+        
+        ( TransactionServer.lockManager ).unLock( account, transaction);
         // return the updated balance
         return balance;
     }
@@ -108,5 +118,14 @@ public class AccountManager
         System.out.println(" Opening tansaction...");
         Account account = getAccount( account1.getID() );
         Account secondAccount = getAccount( account2.getID() );
+    }
+    
+    public int getBranchTotal() {
+        int total = 0;
+        for (Account current: accounts) {
+            total += current.getBalance();
+        }
+        
+        return total;
     }
 }

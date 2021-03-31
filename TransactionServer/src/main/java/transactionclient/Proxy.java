@@ -7,6 +7,7 @@ package transactionclient;
 
 import java.util.ArrayList;
 import java.util.Random;
+import transactionserver.AccountManager;
 import utils.PropertyHandler;
 
 public class Proxy implements Runnable{
@@ -25,6 +26,8 @@ public class Proxy implements Runnable{
         ArrayList<Integer> accountIDs = transaction.openTransaction();
 
         Random rand = new Random();
+        
+        int writeResult;
 
         // pick two random accounts
         int sourceAcctIdx = rand.nextInt(accountIDs.size());
@@ -40,12 +43,22 @@ public class Proxy implements Runnable{
         // use API to request transfer
         int sourceBal = transaction.read(accountIDs.get(sourceAcctIdx));
         sourceBal -= transferAmount;
-        transaction.write(accountIDs.get(sourceAcctIdx), sourceBal);
-
-        int destBal = transaction.read(accountIDs.get(destAcctIdx));
-        destBal += transferAmount;
-        transaction.write(accountIDs.get(destAcctIdx), destBal);
-
-        transaction.closeTransaction();
+        writeResult = transaction.write(accountIDs.get(sourceAcctIdx), sourceBal);
+        
+        if (writeResult != AccountManager.DEADLOCK) {
+            int destBal = transaction.read(accountIDs.get(destAcctIdx));
+            destBal += transferAmount;
+            writeResult = transaction.write(accountIDs.get(destAcctIdx), destBal);
+            
+            if (writeResult == AccountManager.DEADLOCK) {
+                System.out.println("Transaction #" + transaction.getTransID() + " Experienced Deadlock");
+                transaction.close();
+            }
+            else {
+                transaction.closeTransaction();
+            }
+        }
+        
+        
     }
 }

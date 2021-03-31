@@ -1,7 +1,9 @@
 package transactionserver;
 
 import java.util.*;
+import transactionclient.TransactionClient;
 import static transactionserver.LockName.*;
+import utils.SystemLog;
 
 public class Lock
 {
@@ -10,6 +12,8 @@ public class Lock
     private Vector<Transaction> holders;
     private Vector<Transaction> requesting;
     private LockType lockedType;
+    
+    
 
     public Lock( Account acct )
     {
@@ -21,12 +25,25 @@ public class Lock
 
     
     public synchronized void acquire( Transaction transaction, LockType lockType) {
+        Transaction log = transaction;
+        boolean deadlock = false;
         
+        String template = "Transaction #" + transaction.getTID() + " [Lock.acquire]                  | ";
+        String accountStr = "account #" + acct.getID();
         boolean doneWaiting = false;
-        
-        while (checkForConflicts(lockedType, lockType)) {
+        boolean waitRecorded = false;
+        LockType temp = lockedType;
+        log.write(template + "try " + lockedType.toString() + " on " + accountStr);
+        while (checkForConflicts(transaction, lockedType, lockType)) {
             try {
-                requesting.add(transaction);
+                if (!waitRecorded) {
+                    log.write(template + "current lock " + lockedType.toString() + " held by transaction(s)" + getHolderStr(transaction) + " on " + accountStr + ", new lock " + lockType.toString() + ", conflict!");
+                    log.write(template + "---> wait to set WRITE_LOCK on " + accountStr);
+                    requesting.add(transaction);
+                    transaction.addLock(this);
+                    waitRecorded = true;
+                    transaction.setRequesting(lockType);
+                }
                 wait();
                 
                 doneWaiting = true;
@@ -35,34 +52,59 @@ public class Lock
         }
         
         if (doneWaiting){
+            System.out.println("GOT OUT");
             requesting.remove(transaction);       
         }
         
+        // "Transaction #" + transaction.getTID() + " [Lock.acquire]                 | lock set to " + lockedType.toString() + " on account #" + acct.getID()
+        // Transaction #" + transaction.getTID() + " [Lock.acquire]                 | current lock " + lockedType.toString() + " on account #" + acct.getID() + ", no holder, no conflict");
         if (holders.isEmpty()) {
             holders.addElement(transaction);
+            log.write(template + "current lock " + lockedType.toString() + " on " + accountStr + ", no holder, no conflict");
+            lockedType = lockType;
+            log.write(template + "lock set to " + lockedType.toString() + " on " + accountStr);
+            
+        }
+        else if (holders.size() == 1 && holders.get(0).equals(transaction)) {
+             
+            log.write(template + "current lock " + lockedType.toString() + " on " + accountStr + ", transaction is sole holder, no conflict");
+            log.write(template + "ignore setting " + lockedType.toString() + " to " + lockType.toString() + " on " + accountStr);
             lockedType = lockType;
         }
         else if (lockedType.getLock() == READ_LOCK && lockType.getLock() == READ_LOCK) {
             if (!holders.contains(transaction)) {
                 holders.addElement(transaction);
             }
+            log.write(template + "current lock " + lockedType.toString() + " on " + accountStr + ", sharing lock, no conflict");
+            transaction.addLock(this);
+            
+  
         }
         else if (holders.contains(transaction)) {
-            while (lockedType.getLock() != EMPTY_LOCK )
+             
+            while (holders.size() < 1 && !deadlock)
             {
                 try {
                     wait();
+                    
+                    deadlock = checkForDeadlocks(transaction);
                 } catch (InterruptedException e) {
                 }
             }
-       
-            lockType.promote();
+            
+            if (!deadlock) {
+                lockType.promote();
+                log.write(template + "promote " + temp.toString() + " to " + lockedType.toString() + " on account #" + acct.getID());
+            }
         }
-        
     }
     
-    private boolean checkForConflicts(LockType lock1, LockType lock2) {
-        if (lock1.getLock() == READ_LOCK && lock2.getLock() == WRITE_LOCK)
+   
+    private boolean checkForConflicts(Transaction transaction, LockType lock1, LockType lock2) {
+        if (holders.contains(transaction)){
+            return false;
+        }
+        else if (lock1.getLock() == READ_LOCK && lock2.getLock() == WRITE_LOCK)
         {
             return true;
         }
@@ -80,6 +122,40 @@ public class Lock
         return false;
     }
     
+    private boolean checkForDeadlocks(Transaction current) {
+        int count = 0;
+        System.out.println("DEADLOCK");
+        if (current.getRequesting() == WRITE_LOCK) {
+            for (Transaction holding: holders){
+                if (holding.getRequesting() == WRITE_LOCK) {
+                    count += 1;
+                }
+            }
+            
+            if (count > 1) {
+                current.signalDeadlock();
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    public String getHolderStr(Transaction current) {
+        String holding = "";
+        
+        for (Transaction item: holders) {
+            if (!item.equals(current)) {
+                holding += " " + item.getTID();
+            }
+        }
+        
+        return holding;
+    }
+    
+    public LockName getLockType() {
+        return lockedType.getLock();
+    }
     
     /*
         if (lockType == READ_LOCK)
@@ -136,9 +212,10 @@ public class Lock
         //    lockType.promote();
         //}
 
-    public synchronized void release(int transid)
+    public synchronized void release(Transaction transaction)
     {
-        holders.removeElement(transid);
+
+        holders.removeElement(transaction);
         if (holders.isEmpty())
         {
             lockedType.clearLock();
