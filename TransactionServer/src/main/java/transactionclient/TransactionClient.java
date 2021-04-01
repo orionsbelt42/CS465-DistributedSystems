@@ -29,6 +29,7 @@ public class TransactionClient
         Proxy ops;
         Thread[] working = new Thread[numTransactions];
         
+        // create new thread for every transaction
         for (int transNum = 0; transNum < numTransactions; transNum++){
             ops = new Proxy(configData);
             Thread thread = new Thread(ops);
@@ -37,14 +38,6 @@ public class TransactionClient
             working[transNum] = thread;
         }
         
-        
-        for (Thread thread : working) {
-            try {
-                thread.join();
-            } catch (InterruptedException e) {
-                System.out.println("Error Joining thread " + thread.getName());
-            }
-        }
         
         log.close();
     }

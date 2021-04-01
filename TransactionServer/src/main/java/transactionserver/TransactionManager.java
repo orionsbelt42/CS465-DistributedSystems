@@ -9,6 +9,9 @@ public class TransactionManager
 {
     static ArrayList<Transaction> transactionList; // array for all transactions
     
+    /**
+     * Nested worker class
+     */
     public class TransactionManagerWorker implements Runnable {
         
         Socket connection; // socket connection to client
@@ -24,6 +27,14 @@ public class TransactionManager
         AccountManager acctManager;
 
         SystemLog log = TransactionServer.log;
+        
+        /**
+         * Default constructor
+         * 
+         * @param socket socket for connection
+         * @param acctManager program account manager option
+         * @param id id number to assign to transaction
+         */
         public TransactionManagerWorker(Socket socket, AccountManager acctManager, int id) {
             
             try {
@@ -81,11 +92,14 @@ public class TransactionManager
             return buffer; // return message from client
         }
 
+        /**
+         * thread run method
+         */
         @Override
         public void run() {
             // recv and verify first message
             String msg = recv();
-            int transID = -1;
+            int transID = -1; // 
             int acctNum;
             int amount;
             int balance;
@@ -98,8 +112,9 @@ public class TransactionManager
                 // create transaction object
                 transactionList.add(transaction);
                 writer = new MessageWriter(transaction.getTID());
-                log.write("Transaction #" + transaction.getTID() + " [TransactionManagerWorker.run] OPEN_TRANSACTION #" + transaction.getTID());
-                send(writer.transactionResponse(accounts));
+                transaction.write("Transaction #" + transaction.getTID() + " [TransactionManagerWorker.run] OPEN_TRANSACTION #" + transaction.getTID());
+                send(writer.transactionResponse(accounts)); // send response
+                transaction.setStatus(transaction.RUNNING);
                 
             }
             
@@ -112,44 +127,45 @@ public class TransactionManager
                     case "READ_REQUEST":
                         transID = Integer.parseInt(args.get(1));
                         acctNum = Integer.parseInt(args.get(2));
-                        log.write("Transaction #" + transID + " [TransactionManagerWorker.run] READ_REQUEST  >>>>>>>>>>>>>>>>>>>> account #" + acctNum);
+                        transaction.write("Transaction #" + transID + " [TransactionManagerWorker.run] READ_REQUEST  >>>>>>>>>>>>>>>>>>>> account #" + acctNum);
+    
                         balance = acctManager.read(acctNum, transaction);
-                        log.write("Transaction #" + transID + " [TransactionManagerWorker.run] READ_REQUEST  <<<<<<<<<<<<<<<<<<<< account #" + acctNum + ", balance $" + balance);
+                        transaction.write("Transaction #" + transID + " [TransactionManagerWorker.run] READ_REQUEST  <<<<<<<<<<<<<<<<<<<< account #" + acctNum + ", balance $" + balance);
                         send(writer.readResponse(acctNum, balance));
                         break;
                     case "WRITE_REQUEST":
                         transID = Integer.parseInt(args.get(1));
                         acctNum = Integer.parseInt(args.get(2));
                         amount = Integer.parseInt(args.get(3));
-                        log.write("Transaction #" + transID + " [TransactionManagerWorker.run] WRITE_REQUEST >>>>>>>>>>>>>>>>>>>> account #" + acctNum + ", new balance $" + amount);
+                        transaction.write("Transaction #" + transID + " [TransactionManagerWorker.run] WRITE_REQUEST >>>>>>>>>>>>>>>>>>>> account #" + acctNum + ", new balance $" + amount);
+                        
                         balance = acctManager.write(acctNum, transaction, amount);
-                        log.write("Transaction #" + transID + " [TransactionManagerWorker.run] WRITE_REQUEST <<<<<<<<<<<<<<<<<<<< account #" + acctNum + ", new balance $" + balance);
+                        transaction.write("Transaction #" + transID + " [TransactionManagerWorker.run] WRITE_REQUEST <<<<<<<<<<<<<<<<<<<< account #" + acctNum + ", new balance $" + balance);
                         send(writer.writeResponse(acctNum, balance));
                         break;
                     case "CLOSE_TRANSACTION":
-                        
-                        log.write("Transaction #" + transID + " [TransactionManagerWorker.run] CLOSE_TRANSACTION #" + transID);
+                        TransactionServer.lockManager.unLock(transaction);
+                        transaction.write("Transaction #" + transID + " [TransactionManagerWorker.run] CLOSE_TRANSACTION #" + transID);
                         keepOpen = false;
+                        
+                        send(writer.committed());
+                        transaction.setStatus(transaction.FINISHED);
+                        transactionList.remove(transaction);
                 }
                 
                 
             }
-            transaction.clearLocks();
-            // assign id to transaction object
-            
-            // add transaction to list of transactions held by manager
-            
-            // return transaction id to clientAPI 
-            
-            // loop over next messages 
-                // process message (big switch statement)
-                
-                // handle read/write requests through AccountManager
-            
+
         }
         
     }
     
+    
+    /**
+     * default constructor
+     * 
+     * @param logFile 
+     */
     public TransactionManager(String logFile) {
         this.transactionList = new ArrayList<Transaction>();
 

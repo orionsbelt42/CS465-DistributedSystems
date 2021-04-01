@@ -76,17 +76,10 @@ public class AccountManager
         
         // lock the account for writing so no other transactions can read/write it 
         ( TransactionServer.lockManager ).setLock( account, transaction, lockType );
-        
-        // check for deadlock before modifying balance
-        if (transaction.isDeadlocked()) {
-            System.out.println("HELLO");
-            return DEADLOCK;
-        }
-        
+       
         // with lock set, update the account balance
         account.setBalance( balance );
         
-        ( TransactionServer.lockManager ).unLock( account, transaction);
         // return the updated balance
         return balance;
     }
@@ -108,18 +101,16 @@ public class AccountManager
         
         // lock the account for reading 
         ( TransactionServer.lockManager ).setLock( account, transaction, lockType);
+        
         // after locking, read and return account balance 
         return (getAccount( accountNumber )).getBalance();
     }
-
-    // I don't think this is needed here
-    public void openTranscation( Account account1, Account account2, double money)
-    {
-        System.out.println(" Opening tansaction...");
-        Account account = getAccount( account1.getID() );
-        Account secondAccount = getAccount( account2.getID() );
-    }
     
+    /**
+     * gets total sum of all managed accounts
+     * 
+     * @return 
+     */
     public int getBranchTotal() {
         int total = 0;
         for (Account current: accounts) {

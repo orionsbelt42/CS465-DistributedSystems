@@ -6,9 +6,13 @@ import utils.SystemLog;
 public class Transaction
 {
     // transaction id
+    public static final int RUNNING = 0;
+    public static final int FINISHED = 1;
+    public static final int DEADLOCKED = 2;
+    
+    
     int transactionID;
-    boolean deadlocked;
-    LockType requesting;
+    int status;
     
     private ArrayList<String> transactionRecord; 
     SystemLog serverLog = TransactionServer.log;
@@ -25,13 +29,14 @@ public class Transaction
     {
         // allocate memory for a new list of locks
         listOfLocks = new ArrayList<Lock>();
-        
-        // default to no deadlocks 
-        deadlocked = false;
 
         // set the transaction id
         transactionID = ID;
         
+        // set initial status
+        this.status = RUNNING;
+        
+        // stores all input and output for the transaction
         transactionRecord = new ArrayList<>(); 
     }
 
@@ -63,38 +68,52 @@ public class Transaction
         return this.transactionID == other.transactionID;
     }
     
+    /**
+     * add lock to list 
+     * 
+     * @param newLock new lock to add
+     */
     public void addLock(Lock newLock){
         listOfLocks.add(newLock);
     }
-    
-    public void clearLocks(){
-        for (Lock lock: listOfLocks) {
-            lock.release(this);
-        }
+
+    /**
+     * set current transaction status
+     * 
+     * @param value new status
+     */
+    public void setStatus(int value) {
+        this.status = value;
     }
     
+    /**
+     * get transaction value
+     * 
+     * @return the current status
+     */
+    public int getStatus() {
+        return this.status;
+    }
+    
+    
+    /**
+     * gets transaction history/record 
+     * 
+     * @return the record
+     */
     public ArrayList<String> getRecord() {
         return transactionRecord;
     }
     
+    /**
+     * write message to console and file
+     * 
+     * @param message message to write
+     */
     public void write(String message) {
         transactionRecord.add(message);
         
         serverLog.write(message);
     }
     
-    public void setRequesting(LockType requested) {
-        requesting = requested;
-    }
-    
-    public LockName getRequesting() {
-        return requesting.getLock();
-    }
- 
-    public void signalDeadlock(){
-        deadlocked = true;
-    }
-    public boolean isDeadlocked() {
-        return deadlocked;
-    }
 }

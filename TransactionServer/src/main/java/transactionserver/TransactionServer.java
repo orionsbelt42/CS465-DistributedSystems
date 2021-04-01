@@ -10,7 +10,6 @@ public class TransactionServer
     public static LockManager lockManager = new LockManager(); // need to work on this class still
     
     public static SystemLog log = new SystemLog("server.log");
-    public static SystemLog deadlockLog = new SystemLog("deadlocks.log");
     
     public static void main(String[] args) throws IOException
     {
@@ -41,11 +40,13 @@ public class TransactionServer
         
         // create TransactionManager here
         TransactionManager transManager = new TransactionManager(logFile); // need to work on this class still
+        System.out.println("[TransactionServer.TransactionServer] TransactionManager created");
         
+        System.out.println("[TransactionServer.TransactionServer] LockManager created");
         // create AccountManager here
             // pass number of accts + initial balance
         AccountManager acctManager = new AccountManager( numberOfAccounts, initialBalance );
-            
+        System.out.println("[TransactionServer.TransactionServer] AccountManager created");    
         // create ServerSocket here
         try (ServerSocket serverSocket = new ServerSocket(port);)
         {

@@ -5,12 +5,21 @@ import static transactionserver.LockName.*;
 public class LockType 
 {
     private LockName lock;
-
+    
+    /**
+     * Default constructor
+     */
     public LockType()
     {
         lock = LockName.EMPTY_LOCK;
     }
     
+    
+    /**
+     * Setter constructor
+     * 
+     * @param newlock 
+     */
     public LockType(LockName newlock)
     {
         lock = newlock;
@@ -35,15 +44,30 @@ public class LockType
         }
     }
 
+    /**
+     * reset to empty lock state
+     */
     public void clearLock()
     {
         lock = LockName.EMPTY_LOCK;
     }
     
+    
+    /**
+     * getter method for lock name/type
+     * 
+     * @return the LockName value stored
+     */
     public LockName getLock() {
         return lock;
     }
     
+    
+    /**
+     * Converts lock type value to printable string
+     * 
+     * @return printable lock type
+     */
     @Override
     public String toString() {
         String lockStr = "EMPTY_LOCK";

@@ -9,7 +9,6 @@ import utils.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import transactionserver.AccountManager;
 
 /**
  *
@@ -169,7 +168,7 @@ public class TransactionAPI {
         char current;
         try {
             current = (char)fromServer.read();
-            while (current != '\n') {
+            while (current != '\n') { // loop while the line has not ended
                 buffer += current;
                 current = (char)fromServer.read();
             }
@@ -201,15 +200,18 @@ public class TransactionAPI {
         // listen for the transaction id response from server
         String recieved = recv();
         
+        // convert the message to an object
         response = reader.parseMessage(recieved);
         
+        // get the transaction id
         transactionID = Integer.parseInt(response.get(1));
         
-        writer = new MessageWriter(transactionID, true);
+        writer = new MessageWriter(transactionID, true); // get new writer object
         TransactionClient.log.write("transaction #" + transactionID + " started");
         response.remove(0);
         response.remove(0);
         
+        // parse available accounts
         for (String account:response) {
             converted.add(Integer.parseInt(account));
         }
@@ -225,8 +227,6 @@ public class TransactionAPI {
      */
     public int closeTransaction() {
         // Create and send CLOSE_TRANSACTION message to server
-        
-        System.out.println("TRANSACTION CLOSE");
         send(writer.closeTransaction());
         TransactionClient.log.write("transaction #" + transactionID + " finished");
         close();
@@ -269,6 +269,11 @@ public class TransactionAPI {
         return Integer.parseInt(response.get(3));
     }
     
+    /**
+     * Getter method for current transaction id
+     * 
+     * @return transaction id
+     */
     public int getTransID() {
         return transactionID;
     }
