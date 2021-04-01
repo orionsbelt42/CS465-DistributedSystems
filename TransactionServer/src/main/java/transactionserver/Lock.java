@@ -11,7 +11,6 @@ public class Lock
     // transactions that have lock
     private Vector<Transaction> holders;
     private LockType lockType;
-    private SystemLog deadlockOut = new SystemLog("deadlock.log");
     
     /**
      * default constructor
@@ -35,7 +34,7 @@ public class Lock
         Transaction log = transaction;
         boolean deadlock = false;
         // setup log templates
-        String template = "Transaction #" + transaction.getTID() + " [Lock.acquire]                  | ";
+        String template = "Transaction " + transaction.getTidStr() + " [Lock.acquire]                  | ";
         String acctStr = "account #" + acct.getID();
         String currentLock = "current lock " + lockType.toString() + " ";
         
@@ -86,29 +85,14 @@ public class Lock
         // conflict reached, must wait untill resolved
         else if ( holders.contains(transaction) && newType.getLock() == WRITE_LOCK ) {
             // log conflict and wait
+            
             transaction.write(template + currentLock + "held by transaction(s)" + getHoldingStr() + " on" + acctStr  + ", new lock " + newType.toString() + ", conflict!");
             transaction.write(template + "---> wait to set WRITE_LOCK on " + acctStr);
             
-            // wait till resolved
-            if (holders.size() > 1 && lockType.getLock() == READ_LOCK){
-                // check for previous conflict (DEADLOCK)
-                if (writeConflict) {
-                    deadlockOut.write(transaction.getRecord());
-                    deadlockOut.close();
-                    transaction.setStatus(transaction.DEADLOCKED);
-                }
-                // signal there is a conflict
-                writeConflict = true;
-            }
-                   
-            // wait for other tranactions to finish
-            while (holders.size() > 1) {
-                try{
-                    wait();
-                } catch( InterruptedException except) {
-                }
-            }
-            writeConflict = false; // assumed resolved and remove conflict flag
+            // set deadlock info and flags
+            transaction.setStatus(transaction.DEADLOCKED);
+            transaction.setDeadLock(this);
+            transaction.setLockedOn(acct.getID());
             
         }
     }

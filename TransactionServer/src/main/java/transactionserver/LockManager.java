@@ -24,7 +24,7 @@ public class LockManager
                 foundLock = new Lock(account);
                 theLocks.put(account, foundLock);
                 // log operation
-                transaction.write("Transaction #" + transaction.getTID() + " [LockManager.setLock]           | lock created, account #" + account.getID());
+                transaction.write("Transaction " + transaction.getTidStr() + " [LockManager.setLock]           | lock created, account #" + account.getID());
             }
             // get existing lock object
             else {
@@ -55,4 +55,5 @@ public class LockManager
             }
         }
     }
+    
 }

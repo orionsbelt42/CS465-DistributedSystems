@@ -12,7 +12,9 @@ public class Transaction
     
     
     int transactionID;
-    int status;
+    int status; // flag value running, finished, deadlocked
+    int lockedOn; // account number provess was trying to access on deadlock
+    Lock dead; // lock transaction deadlocked on
     
     private ArrayList<String> transactionRecord; 
     SystemLog serverLog = TransactionServer.log;
@@ -37,7 +39,10 @@ public class Transaction
         this.status = RUNNING;
         
         // stores all input and output for the transaction
-        transactionRecord = new ArrayList<>(); 
+        this.transactionRecord = new ArrayList<>(); 
+        
+        // default value 
+        lockedOn = -1; 
     }
 
     /**
@@ -48,6 +53,20 @@ public class Transaction
     public int getTID(){
         return transactionID;
     }
+    
+    /**
+     * getter function to access transaction ID
+     * 
+     * @return a copy of the transaction ID
+     */
+    public String getTidStr(){
+        if (transactionID > 9 ) {
+            return "#" + transactionID;
+        }
+        return "#" + transactionID + " ";
+        
+    }
+
 
     /**
      * getter function to access locks held by the transaction
@@ -95,6 +114,38 @@ public class Transaction
         return this.status;
     }
     
+    /**
+     * setter for locked on acct value
+     * @param value account id transaction was deadlocked on
+     */
+    public void setLockedOn(int value) {
+        lockedOn = value;
+    }
+    
+    /**
+     * getter for locked on acct value
+     * @return an account id
+     */
+    public int getLockedOn() {
+        return lockedOn;
+    }
+    
+    /**
+     * setter for lock held in deadlock
+     * 
+     * @param lock deadlocked lock
+     */
+    public void setDeadLock(Lock lock) {
+        dead = lock;
+    }
+    
+    /**
+     * getter for caught lock
+     * @return a deadlocked lock
+     */
+    public Lock getDeadLock() {
+        return dead;
+    }
     
     /**
      * gets transaction history/record 

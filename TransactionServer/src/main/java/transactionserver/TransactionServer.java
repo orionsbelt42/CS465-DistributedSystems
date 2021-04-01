@@ -45,9 +45,10 @@ public class TransactionServer
         System.out.println("[TransactionServer.TransactionServer] LockManager created");
         // create AccountManager here
             // pass number of accts + initial balance
-        AccountManager acctManager = new AccountManager( numberOfAccounts, initialBalance );
+        AccountManager acctManager = new AccountManager( numberOfAccounts, initialBalance, applyLocking );
         System.out.println("[TransactionServer.TransactionServer] AccountManager created");    
         // create ServerSocket here
+
         try (ServerSocket serverSocket = new ServerSocket(port);)
         {
             System.out.println("[TransactionServer.TransactionServer] ServerSocket created");
@@ -55,7 +56,7 @@ public class TransactionServer
             while(true)
             {
                 Socket socket = serverSocket.accept(); // wait for a connection
-                TransactionManager.TransactionManagerWorker workerThread = transManager.new TransactionManagerWorker(socket, acctManager, count);
+                TransactionManager.TransactionManagerWorker workerThread = transManager.new TransactionManagerWorker(serverSocket, socket, acctManager, count);
                 // pass connection to TransactionManager to spawn TransactionManagerThread
                 count++;
                 Thread thread = new Thread(workerThread); // assign Runnable to thread
@@ -64,8 +65,5 @@ public class TransactionServer
         } catch (IOException e) {
             System.out.println("Error trying to open server socket on " + hostname + ":" + port);
         }
-        
-        log.write("======================================= BRANCH TOTAL =======================================");
-        log.write("--->  " + acctManager.getBranchTotal());
     }
 }

@@ -4,6 +4,7 @@ public class Account
 {
     private int ID;
     private int accountTotal;
+    private boolean involvedInDeadlock;
 
     /**
      * account object constructor class
@@ -15,6 +16,7 @@ public class Account
     {
 	ID = idNum;
 	accountTotal = moneyInAccount;
+        involvedInDeadlock = false;
     }
 
     /**
@@ -72,5 +74,22 @@ public class Account
      */
     public boolean equals(Account other) {
         return (this.ID == other.ID);
+    }
+    
+    /**
+     * checks if the account was involved in a deadlock
+     * 
+     * @return if the account was involved in a deadlock
+     */
+    public boolean deadlocked() {
+        return involvedInDeadlock;
+    }
+    
+    
+    /**
+     * signals account had deadlocking transactions
+     */
+    public void setDeadlockFlag() {
+        involvedInDeadlock = true;
     }
 }

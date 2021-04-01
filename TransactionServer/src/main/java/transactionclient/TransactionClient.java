@@ -8,7 +8,7 @@ import utils.*;
 
 public class TransactionClient
 {
-    public static SystemLog log = new SystemLog("client.log");
+    public static SystemLog log = new SystemLog("server.log");
     
     public static void main(String[] args) throws IOException
     {
@@ -37,9 +37,11 @@ public class TransactionClient
             
             working[transNum] = thread;
         }
-        
-        
+        while (Thread.activeCount() > 1){
+            // wait
+        }
         log.close();
+        
     }
     
 }
