@@ -196,7 +196,7 @@ public class TransactionManager
         * prints out all deadlocks that were caught 
         */
         public void printDeadlocks() {
-            transaction.write("\n======================================= DEADLOCKED ACCOUNTS INFORMATION =======================================");
+            log.write("\n======================================= DEADLOCKED ACCOUNTS INFORMATION =======================================");
             
             boolean firstInstance;
             for (Account acct: acctManager.getAccounts()) {
@@ -204,16 +204,16 @@ public class TransactionManager
                 for (Transaction dead: deadlockedList) {
                     if (dead.getLockedOn() == acct.getID()){
                         if (firstInstance){
-                            transaction.write("\nAccount #" + acct.getID() + " is involved in deadlock:");
+                            log.write("\nAccount #" + acct.getID() + " is involved in deadlock:");
                             firstInstance = false;
                         }
-                        transaction.write("\ttransaction " + dead.getTidStr() + " trying to set WRITE_LOCK, waiting for release of READ_LOCK, held by transaction(s)" + dead.getDeadLock().getHoldingStr());  
+                        log.write("\ttransaction " + dead.getTidStr() + " trying to set WRITE_LOCK, waiting for release of READ_LOCK, held by transaction(s)" + dead.getDeadLock().getHoldingStr());  
                     }
                 }
             }
             
             log.write("\n======================================= DEADLOCKED TRANSACTIONS INFORMATION =======================================\n");
-            //System.out.println("\n======================================= DEADLOCKED TRANSACTIONS INFORMATION =======================================\n");
+            
             for (Transaction dead: deadlockedList) {
                 ArrayList<String> history = dead.getRecord();
                 
