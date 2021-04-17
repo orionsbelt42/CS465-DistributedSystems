@@ -15,13 +15,21 @@ public class SatelliteManager {
 
     public SatelliteManager() {
         // ...
+        satellites = new Hashtable<>();
     }
 
     public void registerSatellite(ConnectivityInfo satelliteInfo) {
         // ...
+        satellites.put(satelliteInfo.getName(), satelliteInfo);
     }
 
     public ConnectivityInfo getSatelliteForName(String satelliteName) {
         // ..
+        return satellites.get(satelliteName);
+    }
+    
+    public void removeSatellite(String satelliteName) {
+        // ...
+        satellites.remove(satelliteName);
     }
 }
