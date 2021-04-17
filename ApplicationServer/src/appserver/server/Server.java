@@ -176,9 +176,19 @@ public class Server {
                         readFromSat = new ObjectInputStream(satellite.getInputStream());
                         writeToSat =  new ObjectOutputStream(satellite.getOutputStream());
                         
+                        writeToSat.writeObject(message);
+                        message = (Message) readFromSat.readObject();
+                        
+                        writeToNet.writeObject(message);
+                        
+                        
+                        
                     } catch (IOException e) {
                         System.err.println("Failed to create socket: " + e);
                     } 
+                    catch (ClassNotFoundException e) {
+                        System.err.println("Failed to create client socket IO streams: " + e);
+                    }
                     // open object streams,
                     // forward message (as is) to satellite,
                     // receive result from satellite and
