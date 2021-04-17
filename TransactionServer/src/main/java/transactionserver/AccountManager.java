@@ -1,7 +1,6 @@
 package transactionserver;
-
-import java.util.*;
 import static transactionserver.LockName.*;
+import java.util.ArrayList;
 
 
 public class AccountManager
@@ -10,13 +9,15 @@ public class AccountManager
     private static int numberOfAccounts; // total number of accounts
     private static int initialBalance; // the initial balance for each account
 
+    private boolean lockTransactions;
+    public static final int DEADLOCK = -99999999;
     /**
      * Class Constructor 
      * 
      * @param numAccounts the number of accounts to create
      * @param initialBalance the initial balance each account starts with
      */
-    public AccountManager( int numAccounts, int initialBalance )
+    public AccountManager( int numAccounts, int initialBalance, boolean applyLocking )
     {
         // allocate memory for arrayList
         accounts = new ArrayList<Account>();
@@ -25,6 +26,8 @@ public class AccountManager
         // set the initial balance for all the accounts
         AccountManager.initialBalance = initialBalance;
         
+        // set locking
+        lockTransactions = applyLocking;
         // account counter, holds the total number of created accounts 
         int acctIdx;
         
@@ -70,10 +73,24 @@ public class AccountManager
     {
         // get the account matching the id
         Account account = getAccount( accountNumber );
-        // lock the account for writing so no other transactions can read/write it 
-        ( TransactionServer.lockManager ).setLock( account, transaction, WRITE_LOCK );
+           
+        // if locking is enabled lock
+        if (lockTransactions){
+            // create variable for lock type
+            LockType lockType = new LockType(WRITE_LOCK);
+            
+            // lock the account for writing so no other transactions can read/write it 
+            ( TransactionServer.lockManager ).setLock( account, transaction, lockType );
+        }
+        
+        
+        if (transaction.getStatus() == Transaction.DEADLOCKED) {
+            return 0;
+        }
+        
         // with lock set, update the account balance
         account.setBalance( balance );
+        
         // return the updated balance
         return balance;
     }
@@ -89,17 +106,33 @@ public class AccountManager
     {
         // get the account matching the id 
         Account account = getAccount( accountNumber );
-        // lock the account for reading 
-        ( TransactionServer.lockManager ).setLock( account, transaction, READ_LOCK );
+        
+        
+        if (lockTransactions){
+            
+            // create variable for lock type
+            LockType lockType = new LockType(READ_LOCK);
+            // if locking is enabled lock
+            
+            // lock the account for reading 
+            ( TransactionServer.lockManager ).setLock( account, transaction, lockType);
+        }
+        
         // after locking, read and return account balance 
         return (getAccount( accountNumber )).getBalance();
     }
-
-    // I don't think this is needed here
-    public void openTranscation( Account account1, Account account2, double money)
-    {
-        print(" Opening tansaction...");
-        Account account = getAccount( account1 );
-        Account secondAccount = getAccount( account2 );
+    
+    /**
+     * gets total sum of all managed accounts
+     * 
+     * @return 
+     */
+    public int getBranchTotal() {
+        int total = 0;
+        for (Account current: accounts) {
+            total += current.getBalance();
+        }
+        
+        return total;
     }
 }

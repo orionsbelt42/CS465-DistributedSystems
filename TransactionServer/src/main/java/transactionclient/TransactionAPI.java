@@ -9,7 +9,6 @@ import utils.*;
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import transactionserver.TransID;
 
 /**
  *
@@ -51,9 +50,8 @@ public class TransactionAPI {
     public TransactionAPI(PropertyHandler properties) {
         this.config = properties;
         this.hostname = properties.getProperty("SERVER_IP");
-        System.out.println("\nOUTPUT: " + properties.getProperty("SERVER_PORT"));
         this.port = Integer.parseInt(properties.getProperty("SERVER_PORT"));
-        this.reader = new MessageReader();
+        this.reader = new MessageReader(true);
         
         hasHostAddr = true;
         
@@ -114,13 +112,13 @@ public class TransactionAPI {
         }
         catch (UnknownHostException e) // deal with any errors
         {
-            System.err.println("Connection Failed: Unknown Host [" + hostname + "]");
+            System.out.println("Connection Failed: Unknown Host [" + hostname + "]");
             // return failure outcome
             return FAILURE_FLAG;
         }
         catch (IOException e)
         {
-            System.err.println("Couldn't connect to host [" + hostname + ":" + port + "]");
+            System.out.println("Couldn't connect to host [" + hostname + ":" + port + "]");
             // return failure outcome
             return FAILURE_FLAG;
         }
@@ -139,7 +137,7 @@ public class TransactionAPI {
             // return success outcome
             return SUCCESS_FLAG;
         } catch (IOException e) {
-            System.err.println("Couldn't close connection to host [" + hostname + ":" + port + "]");
+            System.out.println("Couldn't close connection to host [" + hostname + ":" + port + "]");
             // return failure outcome
             return FAILURE_FLAG;
         }
@@ -156,17 +154,21 @@ public class TransactionAPI {
             // convert message to bytes and send to server
             this.toServer.write(MSG);
         } catch (IOException e) {
-            System.err.println("Couldn't send message to host [" + hostname + ":" + port + "]");
+            System.out.println("Couldn't send message to host [" + hostname + ":" + port + "]");
         }
         
     }
     
+    /**
+     * function to listen for server messages
+     * @return 
+     */
     private String recv() {
         String buffer = "";
         char current;
         try {
             current = (char)fromServer.read();
-            while (current != '\n') {
+            while (current != '\n') { // loop while the line has not ended
                 buffer += current;
                 current = (char)fromServer.read();
             }
@@ -197,16 +199,19 @@ public class TransactionAPI {
         
         // listen for the transaction id response from server
         String recieved = recv();
-        System.out.println("RECV: " + recieved);
+        
+        // convert the message to an object
         response = reader.parseMessage(recieved);
         
+        // get the transaction id
         transactionID = Integer.parseInt(response.get(1));
         
-        writer = new MessageWriter(transactionID);
-        
+        writer = new MessageWriter(transactionID, true); // get new writer object
+        TransactionClient.log.write("transaction #" + transactionID + " started");
         response.remove(0);
         response.remove(0);
         
+        // parse available accounts
         for (String account:response) {
             converted.add(Integer.parseInt(account));
         }
@@ -222,10 +227,8 @@ public class TransactionAPI {
      */
     public int closeTransaction() {
         // Create and send CLOSE_TRANSACTION message to server
-        
-
         send(writer.closeTransaction());
-            
+        TransactionClient.log.write("transaction #" + transactionID + " finished");
         close();
         
         return 0; // temp return stub
@@ -237,12 +240,12 @@ public class TransactionAPI {
      * @param account
      * @return the outcome of the request
      */
-    public ArrayList<String> read(int account) {
+    public int read(int account) {
         // Create and send READ_REQUEST message to server
  
         send(writer.readRequest(account));
             
-        return reader.parseMessage(recv());
+        return Integer.parseInt(reader.parseMessage(recv()).get(2));
         
         // not sure if server will send response so go off no error?
     }
@@ -254,14 +257,23 @@ public class TransactionAPI {
      * @param amount the amount to write to that account 
      * @return the outcome of the request
      */
-    public ArrayList<String> write(int account, int amount) {
+    public int write(int account, int amount) {
+        ArrayList<String> response;
+        
         // Create and send WRITE_REQUEST message to server
         send(writer.writeRequest(account, amount));
-            
-        return reader.parseMessage(recv());
+        
+        response = reader.parseMessage(recv());
         // not sure if server will send response so go off no error?
+
+        return Integer.parseInt(response.get(3));
     }
     
+    /**
+     * Getter method for current transaction id
+     * 
+     * @return transaction id
+     */
     public int getTransID() {
         return transactionID;
     }

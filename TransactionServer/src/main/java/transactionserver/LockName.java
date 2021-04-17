@@ -5,4 +5,4 @@
  */
 package transactionserver;
 
-public enum LockName{ READ_LOCK, WRITE_LOCK, EMPTY_LOCK };
+public enum LockName{ READ_LOCK, WRITE_LOCK, EMPTY_LOCK }; // lock name values

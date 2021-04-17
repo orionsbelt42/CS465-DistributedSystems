@@ -142,6 +142,7 @@ public class Satellite extends Thread {
 // ------------- Registration incomplete ----------------------
            Message msg = new Message(REGISTER_SATELLITE, satelliteInfo);
         // serverInfo
+
         
         // create server socket
         // ---------------------------------------------------------------

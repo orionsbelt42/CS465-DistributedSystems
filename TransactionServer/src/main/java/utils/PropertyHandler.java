@@ -24,7 +24,6 @@ public class PropertyHandler extends Properties {
     public PropertyHandler(Properties defaultProperties, String propertyFileString) throws FileNotFoundException, IOException {
 
         super(defaultProperties);
-        // System.out.println("[PropertyHandler.PropertyHandler] Property handler called on " + propertyFileString);
 
         propertyFile = getPropertyFile(propertyFileString);
 

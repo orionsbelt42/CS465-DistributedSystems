@@ -24,6 +24,7 @@ public class LoadManager {
     public String nextSatellite() throws Exception {
         
         int numberSatellites;
+        // name of the satellite who is supposed to take the job...
         String sat;
         
         synchronized (satellites) {
@@ -33,6 +34,8 @@ public class LoadManager {
             {
                 lastSatelliteIndex = 0;
             }
+            // convert satellite name to string because satellites.get(index) 
+            // evaluates to Object instead of String
             sat = String.valueOf(satellites.get(lastSatelliteIndex));
             lastSatelliteIndex++;
         }
