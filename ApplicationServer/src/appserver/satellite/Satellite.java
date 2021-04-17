@@ -139,10 +139,18 @@ public class Satellite extends Thread {
     public void run() {
         // register this satellite with the SatelliteManager on the server
         // ---------------------------------------------------------------
-// ------------- Registration incomplete ----------------------
-           Message msg = new Message(REGISTER_SATELLITE, satelliteInfo);
+        ObjectOutputStream writeToApp = null;
+        Message msg = new Message(REGISTER_SATELLITE, satelliteInfo);
         // serverInfo
-
+        try{
+            Socket appSocket = new Socket(serverInfo.getHost(), serverInfo.getPort());
+            writeToApp = new ObjectOutputStream(appSocket.getOutputStream());
+            writeToApp.writeObject(msg);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         
         // create server socket
         // ---------------------------------------------------------------
