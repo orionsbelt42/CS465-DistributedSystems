@@ -137,12 +137,12 @@ public class Satellite extends Thread {
 
     @Override
     public void run() {
-// FUTURE
         // register this satellite with the SatelliteManager on the server
         // ---------------------------------------------------------------
-        // ...
+// ------------- Registration incomplete ----------------------
+           Message msg = new Message(REGISTER_SATELLITE, satelliteInfo);
         // serverInfo
-// FUTURE
+
         
         // create server socket
         // ---------------------------------------------------------------
