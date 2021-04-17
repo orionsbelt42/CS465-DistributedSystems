@@ -4,12 +4,16 @@ import appserver.comm.Message;
 import static appserver.comm.MessageTypes.JOB_REQUEST;
 import static appserver.comm.MessageTypes.REGISTER_SATELLITE;
 import appserver.comm.ConnectivityInfo;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import static java.lang.Integer.valueOf;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Properties;
+import java.util.Scanner;
 import utils.PropertyHandler;
 
 /**
@@ -23,19 +27,66 @@ public class Server {
     static LoadManager loadManager = null;
     static ServerSocket serverSocket = null;
 
+    private int port;
+    private String host;
+    private ServerSocket serverSock;
     public Server(String serverPropertiesFile) {
-
+        
         // create satellite manager and load manager
         // ...
         
         // read server properties and create server socket
         // ...
+        
+        try {
+            File myfp = new File( serverPropertiesFile );
+            Scanner myScanner = new Scanner(myfp);
+            while (myScanner.hasNextLine()) {
+                String data = myScanner.nextLine();
+                String values[] = data.split("\\t");
+                if (values.length > 1)
+                {
+                    if (values[0].trim().equals("PORT"))
+                    {
+                        this.port = Integer.parseInt(values[1]);
+                        System.out.println("ApplicationSever port " + this.port);
+                    }
+                    else if (values[0].trim().equals("HOST"))
+                    {
+                        this.host = values[1];
+                        System.out.println("ApplicationSever host " + this.host);
+                    }
+                }
+            }
+            myScanner.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
+        }
+        try {
+            this.serverSock = new ServerSocket(this.port);
+        } catch (IOException e) {
+            System.err.println("Failed to create ServerSocket: " + e);
+        }
     }
 
     public void run() {
-    // serve clients in server loop ...
-    // when a request comes in, a ServerThread object is spawned
-    // ...
+        // serve clients in server loop ...
+        // when a request comes in, a ServerThread object is spawned
+        // ...
+
+        while (true) 
+        {
+            try {
+                Socket clientSocket = serverSock.accept();
+                
+                ServerThread client = new ServerThread(clientSocket);
+                client.run();
+            } catch (IOException e) {
+                System.err.println("Failed to create client Socket: " + e);
+            }
+        }
+    
     }
 
     // objects of this helper class communicate with satellites or clients
@@ -54,6 +105,12 @@ public class Server {
         public void run() {
             // set up object streams and read message
             // ...
+            try {
+                writeToNet = new ObjectOutputStream(client.getOutputStream());
+                readFromNet = new ObjectInputStream(client.getInputStream());
+            } catch (IOException e) {
+                System.err.println("Failed to create client socket IO streams: " + e);
+            }
 
             
             // process message
