@@ -35,6 +35,8 @@ public class Server {
         // create satellite manager and load manager
         // ...
         
+        loadManager = new LoadManager();
+        
         // read server properties and create server socket
         // ...
         
@@ -96,6 +98,8 @@ public class Server {
         ObjectInputStream readFromNet = null;
         ObjectOutputStream writeToNet = null;
         Message message = null;
+        
+       // String satelliteName;
 
         private ServerThread(Socket client) {
             this.client = client;
@@ -108,9 +112,16 @@ public class Server {
             try {
                 writeToNet = new ObjectOutputStream(client.getOutputStream());
                 readFromNet = new ObjectInputStream(client.getInputStream());
+                
+                // reading message
+                message = (Message) readFromNet.readObject(); 
             } catch (IOException e) {
                 System.err.println("Failed to create client socket IO streams: " + e);
-            }
+            } 
+            
+            catch (ClassNotFoundException e) {
+                System.err.println("Failed to create client socket IO streams: " + e);
+            } 
 
             
             // process message
@@ -122,6 +133,8 @@ public class Server {
                     // register satellite
                     synchronized (Server.satelliteManager) {
                         // ...
+                        Server.satelliteManager.registerSatellite((ConnectivityInfo) message.getContent());
+                        
                     }
 
                     // add satellite to loadManager
@@ -135,18 +148,37 @@ public class Server {
                     System.err.println("\n[ServerThread.run] Received job request");
 
                     String satelliteName = null;
+                    ConnectivityInfo satelliteInfo = null;
                     synchronized (Server.loadManager) {
                         // get next satellite from load manager
                         // ...
+                        try {
+                            satelliteName = Server.loadManager.nextSatellite();
+                        } catch (Exception e) {
+                            System.err.println("Failed to get next satellite: " + e);
+                        }
                         
                         // get connectivity info for next satellite from satellite manager
                         // ...
+                        
+                        satelliteInfo = Server.satelliteManager.getSatelliteForName(satelliteName);
                     }
 
                     Socket satellite = null;
+                    ObjectInputStream readFromSat = null;
+                    ObjectOutputStream writeToSat = null;
+                    
+                    
                     // connect to satellite
                     // ...
-
+                    try {
+                        satellite = new Socket(satelliteInfo.getHost(), satelliteInfo.getPort());
+                        readFromSat = new ObjectInputStream(satellite.getInputStream());
+                        writeToSat =  new ObjectOutputStream(satellite.getOutputStream());
+                        
+                    } catch (IOException e) {
+                        System.err.println("Failed to create socket: " + e);
+                    } 
                     // open object streams,
                     // forward message (as is) to satellite,
                     // receive result from satellite and
