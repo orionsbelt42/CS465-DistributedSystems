@@ -13,7 +13,9 @@ public class LoadManager {
     static ArrayList satellites = null; // list of connected satellites
     static int nextSatelliteIndex = 0; // index of next satellite to visit
 
-    // default constructor
+    /**
+     * LoadManager constructor
+     */
     public LoadManager() {
         // allocate memory for new satellite array
         satellites = new ArrayList<String>();

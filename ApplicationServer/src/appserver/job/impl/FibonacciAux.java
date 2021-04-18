@@ -14,7 +14,11 @@ public class FibonacciAux {
     // number to compute
     Integer number = null; 
     
-    // default constructor
+    /**
+     * FibonacciAux Constructor 
+     * 
+     * @param number nth fib number to compute
+     */
     public FibonacciAux(Integer number) {
         this.number = number;
     }
