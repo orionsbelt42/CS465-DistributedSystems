@@ -10,13 +10,13 @@ import appserver.job.Tool;
  *
  * @author 
  */
-public class NthFib implements Tool{
-    NthFibAux helper = null;
+public class Fibonacci implements Tool{
+    FibonacciAux helper = null;
     
     @Override
     public Object go(Object parameters) {
         
-        helper = new NthFibAux((Integer) parameters);
+        helper = new FibonacciAux((Integer) parameters);
         return helper.getResult();
     }
 }

@@ -5,16 +5,14 @@ import appserver.comm.ConnectivityInfo;
 import appserver.job.UnknownToolException;
 import appserver.comm.Message;
 import static appserver.comm.MessageTypes.JOB_REQUEST;
+import static appserver.comm.MessageTypes.JOB_RESPONSE;
 import static appserver.comm.MessageTypes.REGISTER_SATELLITE;
 import static java.lang.Integer.valueOf;
 
 import appserver.job.Tool;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.Hashtable;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -75,7 +73,7 @@ public class Satellite extends Thread {
             Scanner myScanner = new Scanner(myfp);
             while (myScanner.hasNextLine()) {
                 String data = myScanner.nextLine();
-                String values[] = data.split("\\s=\\s");
+                String values[] = data.split("\\t");
                 if (values.length > 1)
                 {
                     if (values[0].trim().equals("PORT"))
@@ -165,10 +163,13 @@ public class Satellite extends Thread {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Received client request, creating SatelliteThread");
                 SatelliteThread satthread = new SatelliteThread(clientSocket, this);
-                satthread.run();
+                // satthread.run();
+                satthread.start();
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();
+        } catch (SocketException e) {
+            System.err.println("Server Socket closed");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -203,7 +204,10 @@ public class Satellite extends Thread {
                         // processing job request
                         Job job = (Job) message.getContent();
                         Tool tool = getToolObject(job.getToolName());
-                        tool.go(job.getParameters());
+                        
+                        Object result = tool.go(job.getParameters());
+                        message = new Message(JOB_RESPONSE, result);
+                        writeToNet.writeObject(message);
                         break;
 
                     default:
@@ -231,23 +235,26 @@ public class Satellite extends Thread {
     public Tool getToolObject(String toolClassString) throws UnknownToolException, ClassNotFoundException, InstantiationException, IllegalAccessException {
 
         Tool toolObject = null;
-        if (toolsCache.containsKey(toolClassString))
-        {
-            toolObject = (Tool) toolsCache.get(toolClassString);
+        synchronized (toolsCache) {
+            if (toolsCache.containsKey(toolClassString))
+            {
+                System.out.println("Class found in cache");
+                toolObject = (Tool) toolsCache.get(toolClassString);
+            }
+            else
+            {
+                Class toolClass = classLoader.findClass(toolClassString);
+                toolObject = (Tool) toolClass.newInstance();
+                toolsCache.put(toolClassString, toolObject);
+            }
         }
-        else
-        {
-            Class toolClass = classLoader.findClass(toolClassString);
-            toolObject = (Tool) toolClass.newInstance();
-            toolsCache.put(toolClassString, toolObject);
-        }
-
         return toolObject;
     }
 
     public static void main(String[] args) {
         // start the satellite
         Satellite satellite = new Satellite(args[0], args[1], args[2]);
-        satellite.run();
+        satellite.start();
+        
     }
 }
