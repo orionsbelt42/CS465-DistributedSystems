@@ -158,7 +158,7 @@ public class Server {
                         }
                         
                         // get connectivity info for next satellite from satellite manager
-                        satelliteInfo = Server.satelliteManager.getSatelliteForName(satelliteName);
+                        satelliteInfo = Server.satelliteManager.getSatelliteFromName(satelliteName);
                     }
 
                     Socket satellite = null;
