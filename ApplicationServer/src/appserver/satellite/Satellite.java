@@ -26,6 +26,7 @@ import utils.PropertyHandler;
  * or locally from the cache, if a tool got executed before.
  *
  * @author Dr.-Ing. Wolf-Dieter Otte
+ * @author Group 5
  */
 public class Satellite extends Thread {
 
@@ -207,7 +208,10 @@ public class Satellite extends Thread {
                         Job job = (Job) message.getContent();
                         Tool tool = getToolObject(job.getToolName());
                         
+                        // compute nth fibonacci with found tool
                         Object result = tool.go(job.getParameters());
+                        
+                        // pack result as a message and send to server
                         message = new Message(JOB_RESPONSE, result);
                         writeToNet.writeObject(message);
                         break;
@@ -235,23 +239,30 @@ public class Satellite extends Thread {
      * otherwise it is loaded dynamically
      */
     public Tool getToolObject(String toolClassString) throws UnknownToolException, ClassNotFoundException, InstantiationException, IllegalAccessException {
-
+        
         Tool toolObject = null;
         // check if given tool exists in the toolsCache
         synchronized (toolsCache) {
+            // if the class is already in cache
             if (toolsCache.containsKey(toolClassString))
-            {
+            {   
+                // use the object from cache
                 System.out.println("Class found in cache");
                 toolObject = (Tool) toolsCache.get(toolClassString);
             }
             else
             {
-                // otherwise add tool to toolsCache
+                // request the class from the classLoader server
                 Class toolClass = classLoader.findClass(toolClassString);
+                
+                // cast to a Tool object
                 toolObject = (Tool) toolClass.newInstance();
+                
+                // add the Tool class to the cache 
                 toolsCache.put(toolClassString, toolObject);
             }
         }
+        // return the Tool
         return toolObject;
     }
 

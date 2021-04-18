@@ -20,10 +20,10 @@ import utils.PropertyHandler;
  * @author Group 5
  */
 public class FibonacciClient extends Thread {
-    String host = null;
-    int port;
+    String host = null; // server host ip
+    int port; // server port number
     
-    Properties properties;
+    Properties properties; // server properties
 
     int number; // number to compute fibonacci series of 
     
@@ -89,6 +89,7 @@ public class FibonacciClient extends Thread {
             filename =  "../../config/Server.properties";
         }
         
+        // create 48 threads to compute fibonacci(1-48)
         for ( number = 1; number < 49; number++ )
         {
             (new FibonacciClient(filename, number)).start();
