@@ -135,7 +135,7 @@ public class Server {
                     
                     // register satellite
                     synchronized (Server.satelliteManager) {
-                        // ...
+                        // register satellite with satellite manager
                         Server.satelliteManager.registerSatellite((ConnectivityInfo) message.getContent());
                         
                     }
