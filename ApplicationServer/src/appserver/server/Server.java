@@ -38,10 +38,9 @@ public class Server {
         loadManager = new LoadManager();
         satelliteManager = new SatelliteManager();
         System.out.println("LoadManager Starting: ");
-        // read server properties and create server socket
-        // ...
-        
+       
         try {
+            // read server properties
             File myfp = new File( serverPropertiesFile );
             Scanner myScanner = new Scanner(myfp);
             while (myScanner.hasNextLine()) {
@@ -67,6 +66,7 @@ public class Server {
             e.printStackTrace();
         }
         try {
+            // create server socket
             this.serverSock = new ServerSocket(this.port);
         } catch (IOException e) {
             System.err.println("Failed to create ServerSocket: " + e);
@@ -74,15 +74,14 @@ public class Server {
     }
 
     public void run() {
-        // serve clients in server loop ...
-        // when a request comes in, a ServerThread object is spawned
-        // ...
-
+        
+        // server loop; listening...
         while (true) 
         {
             try {
+                // detect clients
                 Socket clientSocket = serverSock.accept();
-                
+                // when a request comes in, a ServerThread object is spawned
                 ServerThread client = new ServerThread(clientSocket);
                 client.start();
             } catch (IOException e) {
@@ -99,8 +98,6 @@ public class Server {
         ObjectInputStream readFromClient = null;
         ObjectOutputStream writeToClient = null;
         Message message = null;
-        
-       // String satelliteName;
 
         private ServerThread(Socket client) {
             this.client = client;
@@ -130,8 +127,6 @@ public class Server {
             // process message if client connection is a satellite
             switch (message.getType()) {
                 case REGISTER_SATELLITE:
-                    // read satellite info
-                    // ...
                     
                     // register satellite
                     synchronized (Server.satelliteManager) {
@@ -142,7 +137,6 @@ public class Server {
 
                     // add satellite to loadManager
                     synchronized (Server.loadManager) {
-                        // ...
                         Server.loadManager.satelliteAdded(((ConnectivityInfo) message.getContent()).getName());
                     }
 
@@ -156,7 +150,6 @@ public class Server {
                     
                     synchronized (Server.loadManager) {
                         // get next satellite from load manager
-                        // ...
                         try {
                             // get next satellite to send to
                             satelliteName = Server.loadManager.nextSatellite();
@@ -165,9 +158,6 @@ public class Server {
                         }
                         
                         // get connectivity info for next satellite from satellite manager
-                        // ...
-                        
-                        // get the connection information for the satellite
                         satelliteInfo = Server.satelliteManager.getSatelliteForName(satelliteName);
                     }
 
@@ -177,7 +167,6 @@ public class Server {
                     
                     
                     // connect to satellite
-                    // ...
                     try {
                         // connect to satellite server
                         satellite = new Socket(satelliteInfo.getHost(), satelliteInfo.getPort());
@@ -202,27 +191,25 @@ public class Server {
                     catch (ClassNotFoundException e) {
                         System.err.println("Failed to create client socket IO streams: " + e);
                     }
-                    // open object streams,
-                    // forward message (as is) to satellite,
-                    // receive result from satellite and
-                    // write result back to client
-                    // ...
 
                     break;
-
+                // if no message type provided, sends error message to console
                 default:
                     System.err.println("[ServerThread.run] Warning: Message type not implemented");
             }
         }
     }
 
-    // main()
+    // main
     public static void main(String[] args) {
         // start the application server
         Server server = null;
+        
+        // if properties file provided, use it
         if(args.length == 1) {
             server = new Server(args[0]);
         } else {
+            // if no properties file is is passed in, pass in default file
             server = new Server("../../config/Server.properties");
         }
         server.run();
