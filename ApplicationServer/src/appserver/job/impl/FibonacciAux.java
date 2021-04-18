@@ -3,9 +3,9 @@ package appserver.job.impl;
 import java.util.Hashtable;
 
 /**
+ * Fibonacci Auxiliary Class
  * 
- * 
- * @author
+ * @author Group 5
  */
 public class FibonacciAux {
     // store fibonacci values already computed
@@ -20,9 +20,9 @@ public class FibonacciAux {
     }
     
     /**
-     * gets nth term of the fibonacci sequence
+     * get the nth term of the fibonacci sequence
      * 
-     * @return 
+     * @return the computed nth term
      */
     public Long getResult() {
         
@@ -61,27 +61,31 @@ public class FibonacciAux {
     }
     
     /**
+     * worker function to compute the nth fibonacci value
      * 
-     * @param term
-     * @param first
-     * @param second
-     * @param nth
-     * @return 
+     * @param term nth term to calculate
+     * @param first first sequence value
+     * @param second second sequence value
+     * @param nth current number in the sequence being calculated  
+     * @return the nth element in the fibonacci sequence
      */
     private Long recursiveFib(Integer term, Long first, Long second, int nth) { 
+        // check to see if value is not computed
         if ( !knownFib.containsKey(nth) ) {
+            // add value to computed storage
             knownFib.put( nth, second );
         }
         
+        // compute when term to compute is 0
         if ( term == 0 ) {
 
             return first;
         }
-        
+        // compute last term 
         else if ( term == 1 ) {
             return second;
         }
-        
+        // recurse with the next values
         return recursiveFib( term - 1, second, first + second, nth + 1 );
         
     }

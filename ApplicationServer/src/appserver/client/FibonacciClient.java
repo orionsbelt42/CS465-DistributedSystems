@@ -15,8 +15,9 @@ import java.util.Properties;
 import utils.PropertyHandler;
 
 /**
- *
- * @author 
+ * Fibonacci Client Class
+ * 
+ * @author Group 5
  */
 public class FibonacciClient extends Thread {
     String host = null;
@@ -24,14 +25,23 @@ public class FibonacciClient extends Thread {
     
     Properties properties;
 
-    int number;
+    int number; // number to compute fibonacci series of 
+    
+    /**
+     * FibonacciClient Constructor
+     * 
+     * @param serverPropertiesFile path to server properties file
+     * @param number number to use in fib computations
+     */
     public FibonacciClient(String serverPropertiesFile, int number) {
         try {
             this.number = number;
             properties = new PropertyHandler(serverPropertiesFile);
-            host = properties.getProperty("HOST");
+            
+            host = properties.getProperty("HOST"); // get server host ip
             System.out.println("[FibonacciClient.FibonacciClient] Host: " + host);
-            port = Integer.parseInt(properties.getProperty("PORT"));
+            
+            port = Integer.parseInt(properties.getProperty("PORT")); // get server port number
             System.out.println("[FibonacciClient.FibonacciClient] Port: " + port);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -45,8 +55,6 @@ public class FibonacciClient extends Thread {
             
             // signal class to use for calculations
             String classString = "appserver.job.impl.Fibonacci";
-            
-            // current number being cal
             
             // create job and job request message
             Job job = new Job(classString, new Integer(number));
