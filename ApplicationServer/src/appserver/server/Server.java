@@ -84,7 +84,7 @@ public class Server {
                 Socket clientSocket = serverSock.accept();
                 
                 ServerThread client = new ServerThread(clientSocket);
-                client.run();
+                client.start();
             } catch (IOException e) {
                 System.err.println("Failed to create client Socket: " + e);
             }
@@ -143,6 +143,7 @@ public class Server {
                     // add satellite to loadManager
                     synchronized (Server.loadManager) {
                         // ...
+                        Server.loadManager.satelliteAdded(((ConnectivityInfo) message.getContent()).getName());
                     }
 
                     break;

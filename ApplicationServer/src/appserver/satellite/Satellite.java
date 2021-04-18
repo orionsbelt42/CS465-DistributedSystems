@@ -12,10 +12,7 @@ import static java.lang.Integer.valueOf;
 import appserver.job.Tool;
 
 import java.io.*;
-import java.net.InetAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.UnknownHostException;
+import java.net.*;
 import java.util.Hashtable;
 import java.util.Scanner;
 import java.util.logging.Level;
@@ -166,10 +163,13 @@ public class Satellite extends Thread {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Received client request, creating SatelliteThread");
                 SatelliteThread satthread = new SatelliteThread(clientSocket, this);
-                satthread.run();
+                // satthread.run();
+                satthread.start();
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();
+        } catch (SocketException e) {
+            System.err.println("Server Socket closed");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -235,23 +235,26 @@ public class Satellite extends Thread {
     public Tool getToolObject(String toolClassString) throws UnknownToolException, ClassNotFoundException, InstantiationException, IllegalAccessException {
 
         Tool toolObject = null;
-        if (toolsCache.containsKey(toolClassString))
-        {
-            toolObject = (Tool) toolsCache.get(toolClassString);
+        synchronized (toolsCache) {
+            if (toolsCache.containsKey(toolClassString))
+            {
+                System.out.println("Class found in cache");
+                toolObject = (Tool) toolsCache.get(toolClassString);
+            }
+            else
+            {
+                Class toolClass = classLoader.findClass(toolClassString);
+                toolObject = (Tool) toolClass.newInstance();
+                toolsCache.put(toolClassString, toolObject);
+            }
         }
-        else
-        {
-            Class toolClass = classLoader.findClass(toolClassString);
-            toolObject = (Tool) toolClass.newInstance();
-            toolsCache.put(toolClassString, toolObject);
-        }
-
         return toolObject;
     }
 
     public static void main(String[] args) {
         // start the satellite
         Satellite satellite = new Satellite(args[0], args[1], args[2]);
-        satellite.run();
+        satellite.start();
+        
     }
 }

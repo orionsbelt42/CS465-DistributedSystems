@@ -21,7 +21,7 @@ public class SatelliteManager {
     public void registerSatellite(ConnectivityInfo satelliteInfo) {
         // ...
         satellites.put(satelliteInfo.getName(), satelliteInfo);
-        LoadManager.satellites.add(satelliteInfo.getName());
+        // LoadManager.satellites.add(satelliteInfo.getName());
     }
 
     public ConnectivityInfo getSatelliteForName(String satelliteName) {
@@ -32,7 +32,7 @@ public class SatelliteManager {
     public void removeSatellite(String satelliteName) {
         // ...
         satellites.remove(satelliteName);
-        LoadManager.satellites.remove(satelliteName);
+        // LoadManager.satellites.remove(satelliteName);
     }
    
 }

@@ -18,21 +18,21 @@ import utils.PropertyHandler;
  *
  * @author 
  */
-public class NthFibClient {
+public class FibonacciClient extends Thread {
     String host = null;
     int port;
     
     Properties properties;
 
     int number;
-    public NthFibClient(String serverPropertiesFile, int number) {
+    public FibonacciClient(String serverPropertiesFile, int number) {
         try {
             this.number = number;
             properties = new PropertyHandler(serverPropertiesFile);
             host = properties.getProperty("HOST");
-            System.out.println("[NthFibClient.NthFibClient] Host: " + host);
+            System.out.println("[FibonacciClient.FibonacciClient] Host: " + host);
             port = Integer.parseInt(properties.getProperty("PORT"));
-            System.out.println("[NthFibClient.NthFibClient] Port: " + port);
+            System.out.println("[FibonacciClient.FibonacciClient] Port: " + port);
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -44,7 +44,7 @@ public class NthFibClient {
             Socket server = new Socket(host, port);
             
             // signal class to use for calculations
-            String classString = "appserver.job.impl.NthFib";
+            String classString = "appserver.job.impl.Fibonacci";
             
             // current number being cal
             
@@ -64,14 +64,14 @@ public class NthFibClient {
             
             
         } catch (Exception ex) {
-            System.err.println("[NthFibClient.run] Error occurred");
+            System.err.println("[FibonacciClient.run] Error occurred");
             ex.printStackTrace();
         }
     }
 
     public static void main(String[] args) {
         
-        NthFibClient client = null;
+        FibonacciClient client = null;
         int number;
         String filename;
         
@@ -83,7 +83,7 @@ public class NthFibClient {
         
         for ( number = 1; number < 49; number++ )
         {
-            new NthFibClient(filename, number).run();
+            (new FibonacciClient(filename, number)).start();
             
         }
     }
