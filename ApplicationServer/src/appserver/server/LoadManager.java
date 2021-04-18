@@ -3,8 +3,10 @@ package appserver.server;
 import java.util.ArrayList;
 
 /**
- *
- * @author Dr.-Ing. Wolf-Dieter Otte
+ * Load Manager For Satellites
+ * 
+ * @author (Structure) Dr.-Ing. Wolf-Dieter Otte
+ * @author Group 5
  */
 public class LoadManager {
     
