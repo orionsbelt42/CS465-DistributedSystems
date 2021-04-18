@@ -5,6 +5,7 @@ import appserver.comm.ConnectivityInfo;
 import appserver.job.UnknownToolException;
 import appserver.comm.Message;
 import static appserver.comm.MessageTypes.JOB_REQUEST;
+import static appserver.comm.MessageTypes.JOB_RESPONSE;
 import static appserver.comm.MessageTypes.REGISTER_SATELLITE;
 import static java.lang.Integer.valueOf;
 
@@ -75,7 +76,7 @@ public class Satellite extends Thread {
             Scanner myScanner = new Scanner(myfp);
             while (myScanner.hasNextLine()) {
                 String data = myScanner.nextLine();
-                String values[] = data.split("\\s=\\s");
+                String values[] = data.split("\\t");
                 if (values.length > 1)
                 {
                     if (values[0].trim().equals("PORT"))
@@ -203,7 +204,10 @@ public class Satellite extends Thread {
                         // processing job request
                         Job job = (Job) message.getContent();
                         Tool tool = getToolObject(job.getToolName());
-                        tool.go(job.getParameters());
+                        
+                        Object result = tool.go(job.getParameters());
+                        message = new Message(JOB_RESPONSE, result);
+                        writeToNet.writeObject(message);
                         break;
 
                     default:

@@ -13,10 +13,10 @@ public class NthFibAux {
         this.number = number;
     }
     
-    public Integer getResult() {
-        int temp = 0;
-        int first = 0;
-        int second = 1;
+    public Long getResult() {
+        long temp = 0;
+        long first = 0;
+        long second = 1;
         
         int iter;
         

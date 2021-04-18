@@ -34,9 +34,10 @@ public class Server {
         
         // create satellite manager and load manager
         // ...
-        
+        System.out.println("Server Starting: ");
         loadManager = new LoadManager();
-        
+        satelliteManager = new SatelliteManager();
+        System.out.println("LoadManager Starting: ");
         // read server properties and create server socket
         // ...
         
@@ -191,11 +192,11 @@ public class Server {
                         message = (Message) readFromSat.readObject();
                         
                         // send result back to client
-                        writeToClient.writeObject(message);
+                        writeToClient.writeObject(message.getContent());
                         
                         
                     } catch (IOException e) {
-                        System.err.println("Failed to create socket: " + e);
+                        System.err.println("Failed to create connection to satellite: " + e);
                     } 
                     catch (ClassNotFoundException e) {
                         System.err.println("Failed to create client socket IO streams: " + e);

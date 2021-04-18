@@ -16,7 +16,7 @@ import utils.PropertyHandler;
 
 /**
  *
- * @author asfre
+ * @author 
  */
 public class NthFibClient {
     String host = null;
@@ -59,8 +59,8 @@ public class NthFibClient {
             // reading result back in from application server
             // for simplicity, the result is not encapsulated in a message
             ObjectInputStream readFromNet = new ObjectInputStream(server.getInputStream());
-            Integer result = (Integer) readFromNet.readObject();
-            System.out.println("RESULT: " + result);
+            Long result = (Long) readFromNet.readObject();
+            System.out.println("Fibonacci of " + number + ": " + result);
             
             
         } catch (Exception ex) {
@@ -83,8 +83,8 @@ public class NthFibClient {
         
         for ( number = 1; number < 49; number++ )
         {
-            client = new NthFibClient(filename, number);
-            client.run();
+            new NthFibClient(filename, number).run();
+            
         }
     }
 }
