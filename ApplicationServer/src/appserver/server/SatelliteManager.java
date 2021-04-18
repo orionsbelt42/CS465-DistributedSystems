@@ -19,7 +19,7 @@ public class SatelliteManager {
      * SatelliteManager constructor 
      */
     public SatelliteManager() {
-        // ...
+        // initializes the Load Manager's 'satellites' hash table
         satellites = new Hashtable<>();
     }
 
@@ -53,6 +53,7 @@ public class SatelliteManager {
      */
     public void removeSatellite(String satelliteName) {
         // ... remove satellite from satellites
+
         satellites.remove(satelliteName);
     }
    

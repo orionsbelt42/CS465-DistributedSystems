@@ -68,7 +68,7 @@ public class Satellite extends Thread {
 
         
         // read properties of the application server and populate serverInfo object
-        // other than satellites, the as doesn't have a human-readable name, so leave it out
+        // other than satellites, the app server doesn't have a human-readable name, so leave it out
         try {
             File myfp = new File(serverPropertiesFile);
             Scanner myScanner = new Scanner(myfp);
@@ -109,6 +109,7 @@ public class Satellite extends Thread {
                 String values[] = data.split("\\s");
                 if (values.length > 1)
                 {
+                    // read properties...
                     if (values[0].trim().equals("PORT"))
                     {
                         clport = valueOf(values[1]);
@@ -122,6 +123,7 @@ public class Satellite extends Thread {
                 }
             }
             myScanner.close();
+            // create class Loader...
             classLoader = new HTTPClassLoader(clhost, clport);
         } catch (FileNotFoundException e) {
             System.out.println("An error occurred.");
@@ -239,6 +241,7 @@ public class Satellite extends Thread {
     public Tool getToolObject(String toolClassString) throws UnknownToolException, ClassNotFoundException, InstantiationException, IllegalAccessException {
         
         Tool toolObject = null;
+        // check if given tool exists in the toolsCache
         synchronized (toolsCache) {
             // if the class is already in cache
             if (toolsCache.containsKey(toolClassString))
